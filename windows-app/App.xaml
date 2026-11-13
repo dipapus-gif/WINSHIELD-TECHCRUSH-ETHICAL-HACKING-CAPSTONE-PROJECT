@@ -91,22 +91,22 @@
         </Style>
 
         <!-- Coloured tiles: same card with a thick coloured top edge. -->
-        <Style x:Key="Tile1" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileCard1" TargetType="Border" BasedOn="{StaticResource Card}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile1}" /><Setter Property="BorderThickness" Value="1,4,1,1" />
         </Style>
-        <Style x:Key="Tile2" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileCard2" TargetType="Border" BasedOn="{StaticResource Card}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile2}" /><Setter Property="BorderThickness" Value="1,4,1,1" />
         </Style>
-        <Style x:Key="Tile3" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileCard3" TargetType="Border" BasedOn="{StaticResource Card}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile3}" /><Setter Property="BorderThickness" Value="1,4,1,1" />
         </Style>
-        <Style x:Key="Tile4" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileCard4" TargetType="Border" BasedOn="{StaticResource Card}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile4}" /><Setter Property="BorderThickness" Value="1,4,1,1" />
         </Style>
-        <Style x:Key="Tile5" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileCard5" TargetType="Border" BasedOn="{StaticResource Card}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile5}" /><Setter Property="BorderThickness" Value="1,4,1,1" />
         </Style>
-        <Style x:Key="Tile6" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileCard6" TargetType="Border" BasedOn="{StaticResource Card}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile6}" /><Setter Property="BorderThickness" Value="1,4,1,1" />
         </Style>
 

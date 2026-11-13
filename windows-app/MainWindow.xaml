@@ -103,38 +103,38 @@
 
                     <!-- Live detection window -->
                     <UniformGrid Grid.Row="2" Columns="6" Margin="0,6,0,0">
-                        <Border Style="{StaticResource Tile1}" Margin="0,0,8,8">
+                        <Border Style="{StaticResource TileCard1}" Margin="0,0,8,8">
                             <StackPanel>
                                 <TextBlock Text="{Binding ThreatLevel}" Style="{StaticResource TileValue}"
                                            Foreground="{Binding ThreatLevel, Converter={StaticResource SeverityToBrush}}" />
                                 <TextBlock Text="Threat level" Style="{StaticResource TileLabel}" />
                             </StackPanel>
                         </Border>
-                        <Border Style="{StaticResource Tile2}" Margin="0,0,8,8">
+                        <Border Style="{StaticResource TileCard2}" Margin="0,0,8,8">
                             <StackPanel>
                                 <TextBlock Text="{Binding ThreatScore, StringFormat={}{0:0}}" Style="{StaticResource TileValue}" Foreground="{DynamicResource Tile2}"  />
                                 <TextBlock Text="Threat score (0-100)" Style="{StaticResource TileLabel}" />
                             </StackPanel>
                         </Border>
-                        <Border Style="{StaticResource Tile3}" Margin="0,0,8,8">
+                        <Border Style="{StaticResource TileCard3}" Margin="0,0,8,8">
                             <StackPanel>
                                 <TextBlock Text="{Binding Modified}" Style="{StaticResource TileValue}" Foreground="{DynamicResource Tile3}"  />
                                 <TextBlock Text="Files changed (live window)" Style="{StaticResource TileLabel}" />
                             </StackPanel>
                         </Border>
-                        <Border Style="{StaticResource Tile4}" Margin="0,0,8,8">
+                        <Border Style="{StaticResource TileCard4}" Margin="0,0,8,8">
                             <StackPanel>
                                 <TextBlock Text="{Binding Renamed}" Style="{StaticResource TileValue}" Foreground="{DynamicResource Tile4}"  />
                                 <TextBlock Text="Files renamed" Style="{StaticResource TileLabel}" />
                             </StackPanel>
                         </Border>
-                        <Border Style="{StaticResource Tile5}" Margin="0,0,8,8">
+                        <Border Style="{StaticResource TileCard5}" Margin="0,0,8,8">
                             <StackPanel>
                                 <TextBlock Text="{Binding Deleted}" Style="{StaticResource TileValue}" Foreground="{DynamicResource Tile5}"  />
                                 <TextBlock Text="Files deleted" Style="{StaticResource TileLabel}" />
                             </StackPanel>
                         </Border>
-                        <Border Style="{StaticResource Tile6}" Margin="0,0,0,8">
+                        <Border Style="{StaticResource TileCard6}" Margin="0,0,0,8">
                             <StackPanel>
                                 <TextBlock Text="{Binding HighEntropy}" Style="{StaticResource TileValue}" Foreground="{DynamicResource Tile6}"  />
                                 <TextBlock Text="Possibly encrypted" Style="{StaticResource TileLabel}" />
@@ -144,31 +144,31 @@
 
                     <!-- Incident statistics -->
                     <UniformGrid Grid.Row="3" Columns="5">
-                        <Border Style="{StaticResource Tile1}" Margin="0,0,8,12" Padding="14,10">
+                        <Border Style="{StaticResource TileCard1}" Margin="0,0,8,12" Padding="14,10">
                             <StackPanel>
                                 <TextBlock Text="{Binding TotalIncidents}" Style="{StaticResource TileValue}" FontSize="20" Foreground="{DynamicResource Tile1}"  />
                                 <TextBlock Text="Incidents recorded" Style="{StaticResource TileLabel}" />
                             </StackPanel>
                         </Border>
-                        <Border Style="{StaticResource Tile4}" Margin="0,0,8,12" Padding="14,10">
+                        <Border Style="{StaticResource TileCard4}" Margin="0,0,8,12" Padding="14,10">
                             <StackPanel>
                                 <TextBlock Text="{Binding OpenIncidents}" Style="{StaticResource TileValue}" FontSize="20" Foreground="{DynamicResource Tile4}"  />
                                 <TextBlock Text="Still open" Style="{StaticResource TileLabel}" />
                             </StackPanel>
                         </Border>
-                        <Border Style="{StaticResource Tile5}" Margin="0,0,8,12" Padding="14,10">
+                        <Border Style="{StaticResource TileCard5}" Margin="0,0,8,12" Padding="14,10">
                             <StackPanel>
                                 <TextBlock Text="{Binding Critical30d}" Style="{StaticResource TileValue}" FontSize="20" Foreground="{DynamicResource Tile5}"  />
                                 <TextBlock Text="Critical (30 days)" Style="{StaticResource TileLabel}" />
                             </StackPanel>
                         </Border>
-                        <Border Style="{StaticResource Tile2}" Margin="0,0,8,12" Padding="14,10">
+                        <Border Style="{StaticResource TileCard2}" Margin="0,0,8,12" Padding="14,10">
                             <StackPanel>
                                 <TextBlock Text="{Binding High30d}" Style="{StaticResource TileValue}" FontSize="20" Foreground="{DynamicResource Tile2}"  />
                                 <TextBlock Text="High (30 days)" Style="{StaticResource TileLabel}" />
                             </StackPanel>
                         </Border>
-                        <Border Style="{StaticResource Tile3}" Margin="0,0,0,12" Padding="14,10">
+                        <Border Style="{StaticResource TileCard3}" Margin="0,0,0,12" Padding="14,10">
                             <StackPanel>
                                 <TextBlock Text="{Binding FileEvents24h}" Style="{StaticResource TileValue}" FontSize="20" Foreground="{DynamicResource Tile3}"  />
                                 <TextBlock Text="File events (24 h)" Style="{StaticResource TileLabel}" />
