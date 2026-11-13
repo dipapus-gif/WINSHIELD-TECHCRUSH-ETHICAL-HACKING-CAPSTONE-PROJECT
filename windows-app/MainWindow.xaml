@@ -5,9 +5,13 @@
         Width="1200" Height="800" MinWidth="960" MinHeight="620"
         Background="{DynamicResource WindowBackground}" Foreground="{DynamicResource TextBrush}"
         FontFamily="Segoe UI" FontSize="13"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResize"
+        PreviewKeyDown="OnKey" StateChanged="OnStateChanged">
 
-    <Grid Margin="16">
+    <Grid x:Name="Root" Margin="16">
+        <Grid.LayoutTransform>
+            <ScaleTransform x:Name="Zoom" ScaleX="1" ScaleY="1" />
+        </Grid.LayoutTransform>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -27,6 +31,11 @@
                     <TextBlock Text="WinShield" Foreground="#FFC933" FontWeight="Bold" FontSize="15" Margin="8,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
             </Border>
+            <Button x:Name="MinBtn" DockPanel.Dock="Right" Content="&#8212;  Minimize" Click="OnMinimize" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Minimize to the taskbar" />
+            <Button x:Name="MaxBtn" DockPanel.Dock="Right" Content="&#9633;  Maximize" Click="OnMaximize" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Enlarge the window to fill the screen" />
+            <Button x:Name="FullBtn" DockPanel.Dock="Right" Content="&#9974;  Full screen" Click="OnFullScreen" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Full screen (F11)" />
+            <Button DockPanel.Dock="Right" Content="A+" Click="OnZoomIn" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Make everything larger (Ctrl and +)" />
+            <Button DockPanel.Dock="Right" Content="A&#8722;" Click="OnZoomOut" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Make everything smaller (Ctrl and -)" />
             <Button x:Name="ThemeBtn" DockPanel.Dock="Right" Click="OnToggleTheme" Style="{StaticResource ActionButton}" Margin="10,0,0,0" ToolTip="Switch between light and dark mode" />
             <Button DockPanel.Dock="Right" Content="Sign out" Click="OnSignOut" Style="{StaticResource ActionButton}" Margin="10,0,0,0" />
             <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Foreground="{DynamicResource MutedText}">

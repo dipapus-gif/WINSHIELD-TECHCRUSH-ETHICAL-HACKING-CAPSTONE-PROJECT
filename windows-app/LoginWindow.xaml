@@ -1,7 +1,7 @@
 <Window x:Class="WinShield.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="WinShield - Sign in" Icon="/winshield.ico" Width="460" Height="690" ResizeMode="NoResize"
+        Title="WinShield - Sign in" Icon="/winshield.ico" Width="460" Height="690" ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen" Background="#0A0A0C"
         FontFamily="Segoe UI" FontSize="14">
 
