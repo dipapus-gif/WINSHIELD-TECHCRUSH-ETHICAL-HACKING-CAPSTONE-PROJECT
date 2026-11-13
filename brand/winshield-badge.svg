@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF0B3"/><stop offset=".28" stop-color="#FFC933"/>
+      <stop offset=".6" stop-color="#C98F00"/><stop offset=".8" stop-color="#FFD966"/><stop offset="1" stop-color="#9A6B00"/>
+    </linearGradient>
+    <linearGradient id="goldV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE9A0"/><stop offset=".5" stop-color="#F5B700"/><stop offset="1" stop-color="#A87000"/>
+    </linearGradient>
+    <radialGradient id="face" cx=".5" cy=".38" r=".75">
+      <stop offset="0" stop-color="#26231A"/><stop offset=".55" stop-color="#101010"/><stop offset="1" stop-color="#040405"/>
+    </radialGradient>
+    <radialGradient id="shieldFill" cx=".5" cy=".3" r=".9">
+      <stop offset="0" stop-color="#2B271B"/><stop offset="1" stop-color="#0B0B0C"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <path id="arcTop" d="M 142,512 A 370,370 0 0 1 882,512"/>
+    <path id="arcBot" d="M 120,512 A 392,392 0 0 0 904,512"/>
+    <path id="arcBin" d="M 434,598 A 88,88 0 0 0 590,598"/>
+  </defs>
+
+  <!-- outer rings -->
+  <circle cx="512" cy="512" r="498" fill="url(#gold)"/>
+  <circle cx="512" cy="512" r="486" fill="#070708"/>
+  <circle cx="512" cy="512" r="478" fill="url(#face)" stroke="url(#gold)" stroke-width="3"/>
+  <circle cx="512" cy="512" r="452" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity=".55"/>
+  <circle cx="512" cy="512" r="300" fill="none" stroke="url(#gold)" stroke-width="7"/>
+  <circle cx="512" cy="512" r="288" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity=".6"/>
+
+  <!-- lettering -->
+  <g font-family="'Liberation Serif','Times New Roman',serif" font-weight="700" fill="url(#goldV)">
+    <text font-size="92" letter-spacing="20" text-anchor="middle"><textPath href="#arcTop" startOffset="50%">WINSHIELD</textPath></text>
+    <text font-size="40" letter-spacing="9" text-anchor="middle"><textPath href="#arcBot" startOffset="50%">SECURITY  ·  INTEGRITY  ·  TRUST</textPath></text>
+  </g>
+  <!-- ornaments -->
+  <g fill="url(#gold)"><circle cx="86" cy="512" r="9"/><circle cx="938" cy="512" r="9"/></g>
+  <g fill="url(#gold)" opacity=".8"><path d="M512 122 l9 16 -9 16 -9 -16z" transform="translate(0,0) scale(.0001)"/></g>
+
+  <!-- faint binary flanking the shield -->
+  <g font-family="'DejaVu Sans Mono',monospace" font-size="21" fill="#FFC933" opacity=".38" letter-spacing="3">
+    <text transform="translate(332,540) rotate(-90)" text-anchor="middle">10110100111010</text>
+    <text transform="translate(692,540) rotate(90)" text-anchor="middle">01101011100101</text>
+  </g>
+
+  <!-- padlock shackle -->
+  <path d="M 408,330 V 292 C 408,226 616,226 616,292 V 330" fill="none" stroke="url(#goldV)" stroke-width="30" stroke-linecap="round"/>
+  <path d="M 408,330 V 292 C 408,226 616,226 616,292 V 330" fill="none" stroke="#0A0A0B" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- shield -->
+  <path d="M 512,318 L 372,364 V 520 C 372,610 430,676 512,716 C 594,676 652,610 652,520 V 364 Z" fill="url(#shieldFill)" stroke="url(#gold)" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M 512,352 L 404,388 V 516 C 404,588 450,640 512,672 C 574,640 620,588 620,516 V 388 Z" fill="none" stroke="url(#gold)" stroke-width="3" opacity=".75"/>
+  <!-- binary ring inside the shield -->
+  <g font-family="'DejaVu Sans Mono',monospace" font-size="19" font-weight="700" fill="#FFD84D" filter="url(#glow)" letter-spacing="2">
+    <text><textPath href="#arcBin" startOffset="50%" text-anchor="middle">10100110101</textPath></text>
+  </g>
+  <!-- keyhole -->
+  <g filter="url(#glow)">
+    <circle cx="512" cy="470" r="34" fill="url(#goldV)"/>
+    <path d="M 500,486 L 494,572 H 530 L 524,486 Z" fill="url(#goldV)"/>
+    <circle cx="512" cy="470" r="14" fill="#0A0A0B"/>
+    <path d="M 506,478 L 503,548 H 521 L 518,478 Z" fill="#0A0A0B"/>
+  </g>
+</svg>
