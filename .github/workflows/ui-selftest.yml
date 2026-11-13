@@ -1,0 +1,28 @@
+name: UI self-test (screenshots)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  ui:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Open every screen in dark and light mode
+        working-directory: windows-app
+        run: dotnet run -c Release -- --ui-selftest ../ui-shots
+        continue-on-error: true
+      - name: Show the log
+        if: always()
+        shell: pwsh
+        run: if (Test-Path ui-shots/selftest.log) { Get-Content ui-shots/selftest.log } else { "no log produced" }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-shots
+          path: ui-shots
