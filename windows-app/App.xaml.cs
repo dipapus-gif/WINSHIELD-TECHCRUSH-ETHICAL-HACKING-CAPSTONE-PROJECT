@@ -29,6 +29,8 @@ public partial class App : Application
             args.Handled = true;
         };
 
+        Ui.ThemeManager.Init();   // before any window exists, so every brush is defined
+
         _protection = new ProtectionService();
         _shell = new ShellViewModel(_protection, ui);
 

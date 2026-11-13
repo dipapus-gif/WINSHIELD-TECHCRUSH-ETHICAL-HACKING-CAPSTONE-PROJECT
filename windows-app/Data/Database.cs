@@ -19,10 +19,23 @@ public static class Database
         return conn;
     }
 
+    /// <summary>The schema is compiled into the program, so it works wherever the .exe is copied to.</summary>
+    private static string LoadSchema()
+    {
+        var asm = typeof(Database).Assembly;
+        using var stream = asm.GetManifestResourceStream("WinShield.schema.sql");
+        if (stream != null)
+        {
+            using var reader = new StreamReader(stream);
+            return reader.ReadToEnd();
+        }
+        // Fallback for builds that did not embed it (the test project).
+        return File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Data", "schema.sql"));
+    }
+
     public static void Initialize()
     {
-        var schemaPath = Path.Combine(AppContext.BaseDirectory, "Data", "schema.sql");
-        var schema = File.ReadAllText(schemaPath);
+        var schema = LoadSchema();
 
         using var conn = Open();
         using (var wal = conn.CreateCommand())

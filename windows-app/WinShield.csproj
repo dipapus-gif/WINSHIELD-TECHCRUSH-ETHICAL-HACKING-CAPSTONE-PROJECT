@@ -42,9 +42,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Data\schema.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <!-- Compiled into the .exe: the app no longer needs a Data folder next to it. -->
+    <EmbeddedResource Include="Data\schema.sql" LogicalName="WinShield.schema.sql" />
   </ItemGroup>
 
 </Project>
