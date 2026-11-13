@@ -62,7 +62,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <StackPanel Grid.Column="0" Foreground="White">
+                            <StackPanel Grid.Column="0">
                                 <TextBlock Text="{Binding StatusTitle}" FontSize="24" FontWeight="Bold" Foreground="White" />
                                 <TextBlock Text="{Binding StatusDetail}" Foreground="White" TextWrapping="Wrap" Margin="0,4,0,0" />
                                 <TextBlock Text="{Binding NetworkText}" Foreground="White" FontWeight="SemiBold" Margin="0,4,0,0" />
