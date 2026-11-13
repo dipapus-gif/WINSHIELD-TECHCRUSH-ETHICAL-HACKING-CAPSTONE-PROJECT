@@ -31,6 +31,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The WPF SDK removes the implicit System.IO import (it clashes with System.Windows.Shapes.Path); the services use plain file APIs. -->
+    <Using Include="System.IO" />
+    <Using Remove="System.Windows.Shapes" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Assets\logo.png" />
     <Resource Include="winshield.ico" />
   </ItemGroup>
