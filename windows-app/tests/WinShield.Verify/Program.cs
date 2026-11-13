@@ -303,6 +303,49 @@ try
         new[] { new IncidentAction { Action = "Process suspended", Success = true } }, true);
     Check("changes the advice once the process was contained", contained.Any(t => t.Contains("was contained")));
     Check("provides general advice and a recovery checklist", RecommendationEngine.General().Count >= 5 && RecommendationEngine.RecoveryGuidance().Count >= 5);
+
+    // ---- accounts: create account, sign in, forgotten password ----
+    var acctFile = Path.Combine(tmp, "accounts-test.json");
+    var ac_store = new AccountStore(acctFile);
+    Check("accounts: starts empty", !ac_store.HasAccounts);
+    Check("accounts: rejects short username", !ac_store.Register("ab", "Passw0rdOK", "Passw0rdOK").Ok);
+    Check("accounts: rejects bad characters in username", !ac_store.Register("bad name!", "Passw0rdOK", "Passw0rdOK").Ok);
+    Check("accounts: rejects weak password (no number)", !ac_store.Register("pascal", "onlyletters", "onlyletters").Ok);
+    Check("accounts: rejects short password", !ac_store.Register("pascal", "a1b2", "a1b2").Ok);
+    Check("accounts: rejects mismatched confirmation", !ac_store.Register("pascal", "Passw0rdOK", "Passw0rdNO").Ok);
+    Check("accounts: rejects password containing the username", !ac_store.Register("pascal", "pascal12345", "pascal12345").Ok);
+    var ac_created = ac_store.Register("Pascal", "Passw0rdOK", "Passw0rdOK");
+    Check("accounts: creates an account and returns a recovery key", ac_created.Ok && ac_created.RecoveryKey is { Length: 23 });
+    Check("accounts: usernames are unique, ignoring case", !ac_store.Register("PASCAL", "Another1Pass", "Another1Pass").Ok);
+    var ac_raw = File.ReadAllText(acctFile);
+    Check("accounts: no plain-text password or recovery key on disk", !ac_raw.Contains("Passw0rdOK") && !ac_raw.Contains(ac_created.RecoveryKey!));
+    Check("accounts: signs in with the right password", ac_store.SignIn("pascal", "Passw0rdOK").Ok);
+    Check("accounts: refuses the wrong password", !ac_store.SignIn("pascal", "Wrong1234").Ok);
+    Check("accounts: same message for unknown user and wrong password",
+        ac_store.SignIn("nobody", "x1x1x1x1x1").Error == ac_store.SignIn("pascal", "Wrong1234").Error);
+    var ac_again = new AccountStore(acctFile);
+    Check("accounts: survive a restart", ac_again.SignIn("pascal", "Passw0rdOK").Ok);
+
+    var ac_badKey = ac_again.ResetPassword("pascal", "AAAAA-AAAAA-AAAAA-AAAAA", "Brand9NewPass", "Brand9NewPass");
+    Check("forgot password: wrong recovery key is refused", !ac_badKey.Ok);
+    var ac_weakNew = ac_again.ResetPassword("pascal", ac_created.RecoveryKey, "short", "short");
+    Check("forgot password: weak new password is refused", !ac_weakNew.Ok);
+    var ac_reset = ac_again.ResetPassword("pascal", ac_created.RecoveryKey!.ToLowerInvariant().Replace("-", " "), "Brand9NewPass", "Brand9NewPass");
+    Check("forgot password: correct key (any case/spacing) resets the password", ac_reset.Ok && ac_reset.RecoveryKey is { Length: 23 });
+    Check("forgot password: new password works, old one does not",
+        ac_again.SignIn("pascal", "Brand9NewPass").Ok && !ac_again.SignIn("pascal", "Passw0rdOK").Ok);
+    Check("forgot password: old recovery key stops working after use",
+        !ac_again.ResetPassword("pascal", ac_created.RecoveryKey, "Third3NewPass", "Third3NewPass").Ok);
+    Check("forgot password: the new recovery key works",
+        ac_again.ResetPassword("pascal", ac_reset.RecoveryKey, "Third3NewPass", "Third3NewPass").Ok && ac_again.SignIn("pascal", "Third3NewPass").Ok);
+    Check("accounts: change password needs the current password",
+        !ac_again.ChangePassword("pascal", "nope", "Fourth4Pass", "Fourth4Pass").Ok && ac_again.ChangePassword("pascal", "Third3NewPass", "Fourth4Pass", "Fourth4Pass").Ok);
+
+    var ac_lockStore = new AccountStore(Path.Combine(tmp, "accounts-lock.json"));
+    ac_lockStore.Register("locky", "Passw0rdOK", "Passw0rdOK");
+    for (int i = 0; i < 5; i++) ac_lockStore.SignIn("locky", "bad-pass-1");
+    var ac_locked = ac_lockStore.SignIn("locky", "Passw0rdOK");
+    Check("accounts: locks for a few minutes after 5 wrong attempts", !ac_locked.Ok && ac_locked.Error!.Contains("Too many"));
 }
 finally
 {

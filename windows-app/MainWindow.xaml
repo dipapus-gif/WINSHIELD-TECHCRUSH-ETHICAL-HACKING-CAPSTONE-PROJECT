@@ -8,7 +8,32 @@
         WindowStartupLocation="CenterScreen">
 
     <Grid Margin="16">
-        <TabControl BorderThickness="0" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Brand and account bar -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,8">
+            <Border DockPanel.Dock="Left" Background="#0A0A0C" CornerRadius="8" Padding="10,5">
+                <StackPanel Orientation="Horizontal">
+                    <Viewbox Width="22" Height="22">
+                        <Canvas Width="24" Height="24">
+                            <Path Fill="#FFC933" Data="M 12,2 L 4,5 L 4,11 C 4,16 7.4,20.3 12,22 C 16.6,20.3 20,16 20,11 L 20,5 Z" />
+                            <Path Stroke="#14110A" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M 8.5,12 L 11,14.5 L 16,9.5" />
+                        </Canvas>
+                    </Viewbox>
+                    <TextBlock Text="WinShield" Foreground="#FFC933" FontWeight="Bold" FontSize="15" Margin="8,0,0,0" VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+            <Button DockPanel.Dock="Right" Content="Sign out" Click="OnSignOut" Style="{StaticResource ActionButton}" Margin="10,0,0,0" />
+            <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedText}">
+                <Run Text="Signed in as " /><Run x:Name="UserText" FontWeight="SemiBold" />
+            </TextBlock>
+            <Border />
+        </DockPanel>
+
+        <TabControl Grid.Row="1" BorderThickness="0" Background="Transparent">
 
             <!-- ============================== DASHBOARD ============================== -->
             <TabItem Header="Dashboard" Padding="14,6">

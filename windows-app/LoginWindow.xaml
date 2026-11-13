@@ -1,0 +1,147 @@
+<Window x:Class="WinShield.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="WinShield - Sign in" Width="460" Height="640" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen" Background="#0A0A0C"
+        FontFamily="Segoe UI" FontSize="14">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="Gold" Color="#FFC933" />
+        <SolidColorBrush x:Key="Ink" Color="#14110A" />
+        <SolidColorBrush x:Key="Panel" Color="#131316" />
+        <SolidColorBrush x:Key="Line" Color="#3A3622" />
+        <SolidColorBrush x:Key="Soft" Color="#A9A28A" />
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#0F0F10" />
+            <Setter Property="Foreground" Value="#F6F1E0" />
+            <Setter Property="CaretBrush" Value="#FFC933" />
+            <Setter Property="BorderBrush" Value="{StaticResource Line}" />
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="Margin" Value="0,4,0,12" />
+        </Style>
+        <Style TargetType="PasswordBox">
+            <Setter Property="Background" Value="#0F0F10" />
+            <Setter Property="Foreground" Value="#F6F1E0" />
+            <Setter Property="CaretBrush" Value="#FFC933" />
+            <Setter Property="BorderBrush" Value="{StaticResource Line}" />
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="Margin" Value="0,4,0,12" />
+        </Style>
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource Soft}" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style x:Key="GoldButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource Gold}" />
+            <Setter Property="Foreground" Value="{StaticResource Ink}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="0,11" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Bd" Property="Opacity" Value="0.88" /></Trigger>
+                            <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Bd" Property="Opacity" Value="0.4" /></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="LinkButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource Gold}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Padding" Value="0,4" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" TextDecorations="Underline"
+                                   HorizontalAlignment="Center" Padding="{TemplateBinding Padding}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <RadialGradientBrush Center="0.9,0" RadiusX="1.1" RadiusY="0.8">
+                <GradientStop Color="#3A2E06" Offset="0" />
+                <GradientStop Color="#0A0A0C" Offset="0.7" />
+            </RadialGradientBrush>
+        </Grid.Background>
+
+        <StackPanel Margin="40,28,40,20">
+            <!-- Logo: gold shield with a check mark -->
+            <Viewbox Width="64" Height="64" HorizontalAlignment="Center">
+                <Canvas Width="24" Height="24">
+                    <Path Fill="#FFC933" Data="M 12,2 L 4,5 L 4,11 C 4,16 7.4,20.3 12,22 C 16.6,20.3 20,16 20,11 L 20,5 Z" />
+                    <Path Stroke="#14110A" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                          Data="M 8.5,12 L 11,14.5 L 16,9.5" />
+                </Canvas>
+            </Viewbox>
+            <TextBlock Text="WinShield" Foreground="#F6F1E0" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,8,0,0" />
+            <TextBlock x:Name="Subtitle" Text="Sign in to your protection console" Foreground="{StaticResource Soft}" HorizontalAlignment="Center" Margin="0,0,0,18" />
+
+            <!-- ============ SIGN IN ============ -->
+            <StackPanel x:Name="SignInPanel">
+                <TextBlock Text="Username" Style="{StaticResource Label}" />
+                <TextBox x:Name="SiUser" />
+                <TextBlock Text="Password" Style="{StaticResource Label}" />
+                <PasswordBox x:Name="SiPass" />
+                <Button x:Name="SiGo" Content="Sign in" Style="{StaticResource GoldButton}" IsDefault="True" Click="OnSignIn" Margin="0,6,0,10" />
+                <Button Content="Forgot password?" Style="{StaticResource LinkButton}" Click="ShowReset" />
+                <Button Content="Create an account" Style="{StaticResource LinkButton}" Click="ShowCreate" />
+            </StackPanel>
+
+            <!-- ============ CREATE ACCOUNT ============ -->
+            <StackPanel x:Name="CreatePanel" Visibility="Collapsed">
+                <TextBlock Text="Choose a username (3-24 letters, numbers, . - _)" Style="{StaticResource Label}" />
+                <TextBox x:Name="CrUser" />
+                <TextBlock Text="Password (8+ characters, a letter and a number)" Style="{StaticResource Label}" />
+                <PasswordBox x:Name="CrPass" />
+                <TextBlock Text="Confirm password" Style="{StaticResource Label}" />
+                <PasswordBox x:Name="CrConfirm" />
+                <Button Content="Create account" Style="{StaticResource GoldButton}" Click="OnCreate" Margin="0,6,0,10" />
+                <Button Content="I already have an account" Style="{StaticResource LinkButton}" Click="ShowSignIn" />
+            </StackPanel>
+
+            <!-- ============ FORGOT PASSWORD ============ -->
+            <StackPanel x:Name="ResetPanel" Visibility="Collapsed">
+                <TextBlock Text="Username" Style="{StaticResource Label}" />
+                <TextBox x:Name="RsUser" />
+                <TextBlock Text="Recovery key (shown when you created the account)" Style="{StaticResource Label}" />
+                <TextBox x:Name="RsKey" FontFamily="Consolas" />
+                <TextBlock Text="New password" Style="{StaticResource Label}" />
+                <PasswordBox x:Name="RsPass" />
+                <TextBlock Text="Confirm new password" Style="{StaticResource Label}" />
+                <PasswordBox x:Name="RsConfirm" />
+                <Button Content="Reset password" Style="{StaticResource GoldButton}" Click="OnReset" Margin="0,6,0,10" />
+                <Button Content="Back to sign in" Style="{StaticResource LinkButton}" Click="ShowSignIn" />
+            </StackPanel>
+
+            <!-- ============ RECOVERY KEY (shown once) ============ -->
+            <StackPanel x:Name="KeyPanel" Visibility="Collapsed">
+                <TextBlock Text="Save your recovery key" Foreground="{StaticResource Gold}" FontSize="18" FontWeight="SemiBold" />
+                <TextBlock TextWrapping="Wrap" Foreground="#DCD5BC" Margin="0,6,0,10"
+                           Text="This is the only way to reset a forgotten password. It is stored nowhere in readable form, so write it down or keep it in a password manager. Anyone with this key can reset your password." />
+                <TextBox x:Name="KeyBox" IsReadOnly="True" FontFamily="Consolas" FontSize="20" FontWeight="Bold" Foreground="#FFC933"
+                         TextAlignment="Center" Padding="10,14" />
+                <Button Content="Copy to clipboard" Style="{StaticResource LinkButton}" Click="OnCopyKey" />
+                <CheckBox x:Name="KeySaved" Foreground="#DCD5BC" Margin="0,10,0,10" Content="I have saved my recovery key" Checked="OnKeySavedChanged" Unchecked="OnKeySavedChanged" />
+                <Button x:Name="KeyGo" Content="Continue" Style="{StaticResource GoldButton}" IsEnabled="False" Click="OnKeyContinue" />
+            </StackPanel>
+
+            <TextBlock x:Name="Msg" Foreground="#F0605F" TextWrapping="Wrap" TextAlignment="Center" Margin="0,14,0,0" />
+            <TextBlock Text="Accounts are stored only on this computer. WinShield never sends them anywhere." Foreground="#6F6850"
+                       FontSize="11" TextWrapping="Wrap" TextAlignment="Center" Margin="0,16,0,0" />
+        </StackPanel>
+    </Grid>
+</Window>

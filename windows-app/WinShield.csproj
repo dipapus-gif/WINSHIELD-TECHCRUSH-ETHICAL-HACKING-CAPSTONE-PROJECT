@@ -13,6 +13,7 @@
 
     <!-- asInvoker by default; the app offers 'Restart as administrator' for the features that need it. -->
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>winshield.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
