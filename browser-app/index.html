@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WinShield - Anti-Ransomware</title>
+<meta name="description" content="WinShield browser edition: real-time ransomware detection, decoy files, file integrity and recovery points for folders you choose.">
+<script>(function(){try{var t=localStorage.getItem('ws-theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})()</script>
+<style>
+:root{
+  --bg:#FFFBEF; --card:#fff; --accent:#F5B700; --on-accent:#14110A; --danger:#C93C3C; --safe:#2E9D57; --warn:#D98E04; --off:#6B7280;
+  --muted:#6B6450; --line:#EADFB8; --row:#F6EFD2; --text:#17140A; --soft:#FFF8DC;
+  --surface:#fff; --line2:#D9CB94; --hover:#FFF1BA; --selrow:#FFF0B8; --glass:rgba(255,255,255,.76);
+  --note-bg:#FFF6D6; --note-line:#F0DC8C; --note-ink:#5A4300; --alert-bg:#FDECEC; --alert-line:#F3B8B8; --alert-ink:#8f2323;
+  --b1:#FFD84D; --b2:#FF9F43; --b3:#7FE3D0; --b4:#C9A8FF; --bgop:.6; color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#08080A; --card:#131316; --accent:#FFC933; --on-accent:#14110A; --danger:#E5534F; --safe:#2FA862; --warn:#E0A100; --off:#7A7766;
+  --muted:#A9A28A; --line:#2A2718; --row:#1E1C12; --text:#F6F1E0; --soft:#0F0F10;
+  --surface:#1A1A1E; --line2:#3A3622; --hover:#26230F; --selrow:#332B08; --glass:rgba(19,19,22,.74);
+  --note-bg:#241E08; --note-line:#5A4A10; --note-ink:#FFE08A; --alert-bg:#3A1717; --alert-line:#7A2B2B; --alert-ink:#FFC9C9;
+  --b1:#FFC400; --b2:#FF6A13; --b3:#7C4DFF; --b4:#12B5A6; --bgop:.5; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);position:relative;overflow-x:hidden;font:13px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}
+.note{background:var(--note-bg);border:1px solid var(--note-line);color:var(--note-ink);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px}
+header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+header h1{font-size:20px;margin:0}
+header .sub{color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:2px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.tabs button{background:none;border:0;padding:9px 14px;font:inherit;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent}
+.tabs button[aria-selected=true]{color:var(--text);font-weight:600;border-bottom-color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:12px}
+.card h2{font-size:15px;margin:0 0 8px}
+.hint{color:var(--muted)}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.grow{flex:1 1 0;min-width:0}
+.hero{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.dot{width:16px;height:16px;border-radius:50%;background:var(--safe);flex:none}
+.big{font-size:22px;font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.tile .v{font-size:26px;font-weight:700}
+.tile .l{font-size:11px;color:var(--muted)}
+.btn{padding:6px 12px;border:1px solid var(--line2);background:var(--surface);border-radius:5px;font:inherit;cursor:pointer;margin:0 8px 8px 0;color:var(--text)}
+.btn:hover{background:var(--hover)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600;padding:10px 20px;border-radius:6px;font-size:14px}
+.btn.primary:hover{opacity:.9}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff;font-weight:600;padding:10px 20px;border-radius:6px;font-size:14px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-weight:600;font-size:12px;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--row);vertical-align:top;word-break:break-word}
+tr.sel td{background:var(--selrow)}
+tr.click{cursor:pointer}
+.scroll{overflow-x:auto}
+.pill{display:inline-block;min-width:66px;text-align:center;color:#fff;border-radius:10px;font-size:11px;font-weight:600;padding:2px 8px}
+.Critical,.High,.Fail,.Modified,.Missing,.TRIGGERED{background:var(--danger)}
+.Medium,.Warning,.Elevated,.New{background:var(--warn)}
+.Low,.Pass,.Quiet,.Intact{background:var(--safe)}
+.Info,.Skipped{background:var(--off)}
+.log{font-family:Consolas,ui-monospace,monospace;font-size:12px;max-height:230px;overflow:auto;background:var(--soft);border:1px solid var(--row);border-radius:6px;padding:8px}
+.log div{padding:1px 0;word-break:break-word}
+.log .bad{color:var(--danger);font-weight:600}
+.log .ok{color:var(--safe)}
+.banner{border-radius:8px;padding:10px 14px;margin-bottom:12px;font-weight:600;display:none}
+.banner.show{display:block}
+.banner.alert{background:var(--alert-bg);border:1px solid var(--alert-line);color:var(--alert-ink)}
+.banner.emerg{background:#2b1010;color:#fff}
+.list{list-style:none;margin:0;padding:0}
+.list li{padding:6px 8px;border-bottom:1px solid var(--row);font-family:Consolas,ui-monospace,monospace;font-size:12px;word-break:break-all}
+label.field{display:block;margin:8px 0}
+select,input[type=number]{padding:6px 8px;border:1px solid var(--line2);border-radius:5px;font:inherit;background:var(--surface);color:var(--text)}
+.score{font-size:56px;font-weight:700;line-height:1}
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal-bg.show{display:flex}
+.modal{background:var(--surface);color:var(--text);border-radius:10px;max-width:480px;width:100%;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.modal h3{margin:0 0 8px;font-size:16px}
+.modal .btns{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.modal .btns .btn{margin:0}
+.hidden{display:none}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#1b2330;color:#fff;padding:9px 16px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20;max-width:90vw}
+.toast.show{opacity:1}
+.tag{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 6px;margin-left:6px}
+/* animated background, theme toggle */
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.bg i{position:absolute;border-radius:50%;filter:blur(70px);opacity:var(--bgop);will-change:transform}
+.bg i:nth-child(1){width:46vmax;height:46vmax;left:-12vmax;top:-14vmax;background:radial-gradient(circle,var(--b1),transparent 66%);animation:fa 26s ease-in-out infinite alternate}
+.bg i:nth-child(2){width:42vmax;height:42vmax;right:-14vmax;top:12vh;background:radial-gradient(circle,var(--b2),transparent 66%);animation:fb 32s ease-in-out infinite alternate}
+.bg i:nth-child(3){width:40vmax;height:40vmax;left:20vw;bottom:-20vmax;background:radial-gradient(circle,var(--b3),transparent 66%);animation:fc 38s ease-in-out infinite alternate}
+.bg:after{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:56px 56px;opacity:.22;-webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000,transparent 75%);mask-image:radial-gradient(ellipse at 50% 30%,#000,transparent 75%)}
+.bg:before{content:"";position:absolute;width:34vmax;height:34vmax;right:8vw;bottom:-14vmax;border-radius:50%;filter:blur(80px);opacity:var(--bgop);background:radial-gradient(circle,var(--b4),transparent 66%);animation:fd 34s ease-in-out infinite alternate}
+@keyframes fd{to{transform:translate(-22vw,-12vh) scale(1.25)}}
+@keyframes fa{to{transform:translate(18vw,14vh) scale(1.15)}}
+@keyframes fb{to{transform:translate(-20vw,18vh) scale(.9)}}
+@keyframes fc{to{transform:translate(14vw,-16vh) scale(1.2)}}
+.card,.tile{background:var(--glass);backdrop-filter:blur(8px)}
+.theme{margin-left:auto;width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);background:var(--surface);color:var(--text);cursor:pointer;display:grid;place-items:center;font-size:17px;line-height:1;padding:0;flex:none}
+.theme:hover{border-color:var(--accent)}
+.theme:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.theme .sun{display:none}
+:root[data-theme="dark"] .theme .sun{display:block}
+:root[data-theme="dark"] .theme .moon{display:none}
+@media (prefers-reduced-motion:reduce){.bg i,.bg:before{animation:none}}
+@media (max-width:640px){.wrap{padding:10px}.big{font-size:19px}.score{font-size:44px}}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="wrap">
+  <div class="note"><b>Browser edition.</b> WinShield here does real work on folders you choose: it watches them, scores activity with the same rules as the Windows app, plants decoy files, hashes files and keeps verified recovery points. Everything stays in your browser. Monitoring only runs while this page is open (background tabs are slowed by the browser). Suspending processes, quarantining programs, network isolation and Controlled Folder Access need the Windows app.</div>
+  <header>
+    <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5l-8-3z" fill="#FFC933"/><path d="m8.5 12 2.5 2.5L16 9.5" stroke="#14110A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div><h1>WinShield</h1><div class="sub">Anti-ransomware detection, prevention and incident response</div></div>
+    <button class="theme" id="themeBtn" type="button" aria-label="Switch between light and dark mode" title="Light / dark mode"><span class="moon" aria-hidden="true">☾</span><span class="sun" aria-hidden="true">☀</span></button>
+  </header>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div id="banner" class="banner"></div>
+
+  <!-- DASHBOARD -->
+  <section data-tab="Dashboard">
+    <div class="card hero">
+      <div class="dot" id="protDot"></div>
+      <div class="grow"><div class="big" id="protTitle"></div><div class="hint" id="protSub"></div></div>
+      <button class="btn primary" id="btnToggle"></button>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="v"><span class="pill Quiet" id="threatPill" style="font-size:14px;padding:4px 12px">Quiet</span></div><div class="l">Threat level</div></div>
+      <div class="tile"><div class="v" id="tOpen">0</div><div class="l">Open incidents</div></div>
+      <div class="tile"><div class="v" id="tMod">0</div><div class="l">Files changed (last <span class="winsec">10</span> s)</div></div>
+      <div class="tile"><div class="v" id="tRen">0</div><div class="l">Files renamed</div></div>
+      <div class="tile"><div class="v" id="tEnt">0</div><div class="l">High-entropy files</div></div>
+      <div class="tile"><div class="v" id="tFolders">0</div><div class="l">Protected folders</div></div>
+    </div>
+    <div class="card" id="startCard">
+      <h2>Protect a folder</h2>
+      <div class="hint" style="margin-bottom:8px">Choose a folder and WinShield starts watching it right away. The browser asks for permission first and only this folder is visible to the page.</div>
+      <button class="btn primary" id="btnAdd">Choose a folder to protect</button>
+      <button class="btn" id="btnSandbox">Use a practice folder (in browser memory)</button>
+    </div>
+    <div class="card">
+      <h2>Safe self-test</h2>
+      <div class="hint" style="margin-bottom:8px">Creates 60 harmless files in a <code>WinShield-selftest</code> folder inside a protected folder, then encrypts them with random data, renames them to <code>.locked</code>, drops a ransom-note file and touches a decoy. The real detection engine sees all of it. Nothing outside that folder is touched.</div>
+      <button class="btn danger" id="btnTest">Run self-test</button>
+      <button class="btn" id="btnClean">Clean up self-test files</button>
+    </div>
+    <div class="card">
+      <h2>Emergency protection</h2>
+      <div class="hint" style="margin-bottom:8px">Saves evidence, takes a recovery point of every file that has not been touched yet, and shows what to do next. It cannot stop the attacking program from a browser: disconnect the network and close or shut down the PC.</div>
+      <button class="btn danger" id="btnEmerg">Activate emergency protection</button>
+      <button class="btn" id="btnRelease" disabled>Release emergency protection</button>
+    </div>
+    <div class="card"><h2>Busiest folders right now</h2>
+      <div class="scroll"><table><thead><tr><th>Folder</th><th>Changes</th></tr></thead><tbody id="hotBody"></tbody></table></div>
+      <div class="hint" id="hotEmpty">No file activity in the last few seconds.</div>
+      <div class="hint" style="margin-top:6px">A browser cannot see which program changed a file, so process names are only available in the Windows app.</div>
+    </div>
+    <div class="card"><h2>Live activity</h2><div class="log" id="log"></div></div>
+  </section>
+
+  <!-- INCIDENTS -->
+  <section data-tab="Incidents" class="hidden">
+    <div class="card"><h2>Incident history</h2>
+      <div class="scroll"><table><thead><tr><th>Time</th><th>Severity</th><th>Incident</th><th>Score</th><th>Status</th></tr></thead><tbody id="incBody"></tbody></table></div>
+      <div class="hint" id="incEmpty">No incidents. Run the self-test on the Dashboard to see one.</div>
+    </div>
+    <div class="card" id="incDetail" style="display:none">
+      <h2 id="incTitle"></h2>
+      <div class="hint" id="incDesc" style="margin-bottom:6px"></div>
+      <div class="hint" style="margin-bottom:8px">Rules: <b id="incRules"></b></div>
+      <button class="btn" data-act="false">Mark false positive</button>
+      <button class="btn" data-act="resolve">Mark resolved</button>
+      <button class="btn" id="btnGoRecovery">Go to recovery</button>
+      <button class="btn" id="btnReport">Save report (HTML)</button>
+      <button class="btn" id="btnCsv">Save report (CSV)</button>
+      <button class="btn" id="btnEvidence">Save evidence (JSON)</button>
+      <div class="hint" style="margin-top:2px">Windows app only: <button class="btn" disabled>Suspend process</button><button class="btn" disabled>Quarantine program</button><button class="btn" disabled>Isolate network</button></div>
+      <div class="row">
+        <div class="grow"><h2 style="margin-top:10px">Defensive actions taken</h2><div class="scroll"><table><thead><tr><th>Time</th><th>Action</th><th>Detail</th></tr></thead><tbody id="actBody"></tbody></table></div></div>
+        <div class="grow"><h2 style="margin-top:10px">Affected files (<span id="affCount"></span>)</h2><ul class="list" id="fileList" style="max-height:260px;overflow:auto"></ul></div>
+      </div>
+      <h2 style="margin-top:14px">Recommendations</h2>
+      <ol id="recs" style="margin:0;padding-left:20px"></ol>
+    </div>
+  </section>
+
+  <!-- FOLDERS -->
+  <section data-tab="Folders and integrity" class="hidden">
+    <div class="card"><h2>Protected folders</h2>
+      <div class="hint" style="margin-bottom:8px">WinShield watches these folders for ransomware-like activity.</div>
+      <div class="scroll"><table><thead><tr><th>Folder</th><th>Files</th><th>State</th><th></th></tr></thead><tbody id="folderBody"></tbody></table></div>
+      <div class="hint" id="folderEmpty">No folders yet.</div>
+      <div style="margin-top:8px"><button class="btn" id="btnAdd2">Add folder...</button><button class="btn" id="btnSandbox2">Add practice folder</button></div>
+    </div>
+    <div class="card"><h2>Decoy files (honeypots)</h2>
+      <div class="hint" style="margin-bottom:8px">Bait files placed in each protected folder and in up to three of its sub-folders. Nothing legitimate should touch them, so any change, rename or delete raises an immediate alert.</div>
+      <button class="btn" id="btnDeploy">Place decoy files</button><button class="btn" id="btnRemoveDecoys">Remove decoy files</button>
+      <div class="scroll"><table><thead><tr><th style="width:110px">Status</th><th>Decoy file</th></tr></thead><tbody id="decoyBody"></tbody></table></div>
+    </div>
+    <div class="card"><h2>File integrity</h2>
+      <div style="font-weight:600" id="baseText"></div>
+      <div class="hint" style="margin:2px 0 8px">SHA-256 fingerprints of every file (up to 50 MB each), compared later to show what was changed, deleted, renamed or added.</div>
+      <button class="btn" id="btnBase">Build baseline</button><button class="btn" id="btnCompare">Compare with baseline</button>
+      <div class="hint" id="intProgress"></div>
+      <div style="font-weight:600;margin:6px 0" id="intSummary"></div>
+      <div class="scroll"><table><thead><tr><th style="width:90px">Change</th><th>File</th><th>Detail</th></tr></thead><tbody id="intBody"></tbody></table></div>
+    </div>
+    <div class="hint" style="font-weight:600;margin:4px" id="folderMsg"></div>
+  </section>
+
+  <!-- RECOVERY -->
+  <section data-tab="Recovery" class="hidden">
+    <div class="card"><h2>Recovery points</h2>
+      <div style="font-weight:600" id="recStatus"></div>
+      <div class="hint" style="margin:2px 0 8px">Protected copies of your files, stored in this browser's private storage (identical content is stored once). Every restored file is checked against its recorded hash. Keep another backup on a separate drive or account too.</div>
+      <button class="btn" id="btnPoint">Create recovery point</button>
+      <button class="btn" id="btnVerify">Verify selected</button>
+      <button class="btn" id="btnRestoreSub">Restore to a new sub-folder</button>
+      <button class="btn" id="btnRestore">Restore over originals...</button>
+      <button class="btn" id="btnPrune">Clean up old points</button>
+      <div class="scroll"><table><thead><tr><th>Created</th><th>Folder</th><th>Note</th><th>Files</th><th>New data</th><th>State</th></tr></thead><tbody id="pointBody"></tbody></table></div>
+      <div class="hint" style="font-weight:600;margin-top:8px" id="recMsg"></div>
+    </div>
+  </section>
+
+  <!-- SYSTEM HEALTH -->
+  <section data-tab="System health" class="hidden">
+    <div class="card hero">
+      <div><span class="score" id="score">0</span><span class="hint" style="font-size:18px">/100</span></div>
+      <div class="grow"><div class="big">Protection grade: <span id="grade">-</span></div><div class="hint" id="healthMsg">Press Run check to review this browser's protection setup.</div></div>
+      <button class="btn primary" id="btnScan">Run check</button>
+    </div>
+    <div class="card" id="checks" style="padding:0"></div>
+    <div class="hint">Windows-level checks (Defender, Firewall, UAC, SmartScreen, Secure Boot...) run in the Windows app, because a browser cannot read them.</div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section data-tab="Settings" class="hidden">
+    <div class="card" style="max-width:760px"><h2>Alerts</h2>
+      <label><input type="checkbox" id="setNotify"> Show a desktop notification for new incidents</label><br>
+      <label><input type="checkbox" id="setSound"> Play an alarm sound for high and critical incidents</label>
+    </div>
+    <div class="card" style="max-width:760px"><h2>Detection thresholds</h2>
+      <div class="hint" style="margin-bottom:8px">Distinct files are counted inside a sliding window, so one busy file cannot trigger an alert by itself. Defaults match the Windows app.</div>
+      <label class="field">Window <input type="number" id="s_windowSeconds" style="width:70px"> seconds</label>
+      <label class="field">Mass modify at <input type="number" id="s_massModify" style="width:80px"> files</label>
+      <label class="field">Mass rename (extension change) at <input type="number" id="s_massRename" style="width:80px"> files</label>
+      <label class="field">Mass delete at <input type="number" id="s_massDelete" style="width:80px"> files</label>
+      <label class="field">Ransomware-style extensions at <input type="number" id="s_suspiciousExt" style="width:70px"> files</label>
+      <label class="field">High entropy at <input type="number" step="0.1" id="s_entropyThreshold" style="width:70px"> bits/byte in at least <input type="number" id="s_entropyFiles" style="width:70px"> files</label>
+      <button class="btn primary" id="btnSave">Save settings</button><button class="btn" id="btnDefaults">Restore defaults</button>
+    </div>
+  </section>
+</div>
+
+<div class="modal-bg" id="modalBg"><div class="modal" role="dialog" aria-modal="true"><h3 id="mTitle"></h3><div id="mBody" style="white-space:pre-line"></div><div class="btns"><button class="btn" id="mNo">No</button><button class="btn primary" id="mYes">Yes</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ================= helpers ================= */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const clock = (d=new Date()) => `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+const stamp = t => new Date(t).toLocaleString([], {dateStyle:'short', timeStyle:'medium'});
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const uid = () => Math.random().toString(36).slice(2, 10);
+const MB = 1048576;
+const MAX_HASH = 50*MB, MAX_COPY = 25*MB, MAX_FILES = 5000;
+function lsGet(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch{ return d; } }
+function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} }
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove('show'),3000); }
+function ask(title, body, yes='Yes', no='No'){
+  return new Promise(res=>{
+    $('#mTitle').textContent=title; $('#mBody').textContent=body; $('#mYes').textContent=yes; $('#mNo').textContent=no; $('#mNo').style.display=no?'':'none';
+    $('#modalBg').classList.add('show');
+    const done=v=>{ $('#modalBg').classList.remove('show'); res(v); };
+    $('#mYes').onclick=()=>done(true); $('#mNo').onclick=()=>done(false);
+  });
+}
+async function sha256(bytes){ const d = await crypto.subtle.digest('SHA-256', bytes); return [...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+function download(name, text, type){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); }
+const extOf = p => { const n = p.split('/').pop(); const i = n.lastIndexOf('.'); return i < 0 ? '' : n.slice(i).toLowerCase(); };
+const baseName = p => p.split('/').pop();
+const dirOf = p => { const i = p.lastIndexOf('/'); return i < 0 ? '' : p.slice(0, i); };
+const stemOf = p => { const n = baseName(p); const i = n.lastIndexOf('.'); return i <= 0 ? n : n.slice(0, i); };
+
+/* ================= entropy ================= */
+const EXPECTED_HI = new Set(['.zip','.7z','.rar','.gz','.bz2','.xz','.zst','.tgz','.cab','.iso','.jpg','.jpeg','.png','.gif','.webp','.heic','.avif','.mp3','.mp4','.m4a','.m4v','.mkv','.avi','.mov','.wmv','.flac','.ogg','.opus','.webm','.docx','.xlsx','.pptx','.odt','.ods','.odp','.epub','.pdf','.jar','.apk','.msi','.nupkg','.vsix']);
+function shannon(b){
+  if(!b.length) return 0; const c = new Uint32Array(256); for(let i=0;i<b.length;i++) c[b[i]]++;
+  let e = 0; const n = b.length; for(let i=0;i<256;i++){ if(!c[i]) continue; const p=c[i]/n; e -= p*Math.log2(p); } return e;
+}
+const entropyOf = b => (!b || b.length < 1024) ? -1 : shannon(b);
+
+/* ================= settings ================= */
+const DEFAULTS = {windowSeconds:10, massModify:40, massRename:15, massDelete:40, suspiciousExt:3, entropyThreshold:7.5, entropyFiles:8, notify:true, sound:true};
+const LIMITS = {windowSeconds:[3,120], massModify:[5,5000], massRename:[3,5000], massDelete:[5,5000], suspiciousExt:[1,100], entropyThreshold:[6,8], entropyFiles:[2,1000]};
+function clampSettings(s){ const o = {...DEFAULTS, ...s}; for(const k in LIMITS){ const v = Number(o[k]); o[k] = Math.min(LIMITS[k][1], Math.max(LIMITS[k][0], isFinite(v) ? v : DEFAULTS[k])); } return o; }
+let settings = clampSettings(lsGet('ws.settings', {}));
+
+/* ================= detection engine (port of DetectionEngine.cs) ================= */
+const SEV = ['Info','Low','Medium','High','Critical'];
+const SUSP_EXT = new Set(['.locked','.lock','.encrypted','.encrypt','.enc','.crypt','.crypted','.crypto','.cry','.crypz','.cerber','.locky','.zepto','.wncry','.wnry','.wcry','.ryk','.conti','.lockbit','.blackcat','.akira','.royal','.rhysida','.basta']);
+const NOTE_EXT = new Set(['.txt','.html','.htm','.hta','.url','.rtf','.md']);
+const NOTE_RE = /(how[_\- ]?to[_\- ]?(decrypt|recover|restore))|(decrypt[_\- ]?(your[_\- ]?)?files?)|(recover[_\- ]?(your[_\- ]?)?files?)|(restore[_\- ]?(your[_\- ]?)?files?)|(your[_\- ]?files[_\- ]?(are|have))|(ransom)|(!+readme!*)|(_readme_)/i;
+
+class Engine {
+  constructor(onDetect){ this.onDetect = onDetect; this.events = []; this.lastSev = 0; this.lastEmit = 0; this.lastRules = new Set(); this.metrics = {modified:0, renamed:0, deleted:0, highEntropy:0, score:0}; this.hot = []; }
+  process(e){ this.events.push(e); if(e.honeypot && e.kind !== 'Created') this.evaluate(true); }
+  reset(){ this.events = []; this.lastSev = 0; this.lastEmit = 0; this.lastRules = new Set(); this.metrics = {modified:0,renamed:0,deleted:0,highEntropy:0,score:0}; this.hot = []; }
+  evaluate(force){
+    const s = settings, now = Date.now(), cutoff = now - s.windowSeconds*1000;
+    while(this.events.length && this.events[0].t < cutoff) this.events.shift();
+    const mod = new Set(), ren = new Set(), ext = new Set(), susp = new Set(), del = new Set(), hi = new Set(), notes = new Set(), decoys = new Set(), dirs = new Set(), dirCount = new Map();
+    for(const e of this.events){
+      const d = dirOf(e.path); dirCount.set(d, (dirCount.get(d)||0) + 1);
+      if(e.kind === 'Created' || e.kind === 'Modified'){
+        mod.add(e.path); dirs.add(d);
+        if(e.kind === 'Created'){
+          if(SUSP_EXT.has(e.ext)) susp.add(e.path);
+          if(NOTE_EXT.has(e.ext) && NOTE_RE.test(stemOf(e.path))) notes.add(e.path);
+        }
+      } else if(e.kind === 'Renamed'){
+        ren.add(e.path); dirs.add(d);
+        if(e.ext !== e.oldExt) ext.add(e.path);
+        if(SUSP_EXT.has(e.ext) && !SUSP_EXT.has(e.oldExt || '')) susp.add(e.path);
+      } else if(e.kind === 'Deleted') del.add(e.path);
+      if(e.kind !== 'Deleted' && e.entropy >= s.entropyThreshold && !EXPECTED_HI.has(e.ext)) hi.add(e.path);
+      if(e.honeypot && e.kind !== 'Created') decoys.add(e.path);
+    }
+    let points = 0; const rules = [], reasons = [];
+    const rule = (id, pts, why) => { points += pts; rules.push(id); reasons.push(why); };
+    if(mod.size >= s.massModify*2) rule('R-MASS-MODIFY', 35, `${mod.size} files were created or modified within ${s.windowSeconds} seconds.`);
+    else if(mod.size >= s.massModify) rule('R-MASS-MODIFY', 25, `${mod.size} files were created or modified within ${s.windowSeconds} seconds.`);
+    if(ext.size >= s.massRename) rule('R-EXT-CHANGE', 30, `${ext.size} files had their extension changed.`);
+    if(susp.size >= s.suspiciousExt) rule('R-SUSPICIOUS-EXT', 35, `${susp.size} files now use extensions typical of ransomware (for example .locked or .encrypted).`);
+    else if(susp.size >= 1) rule('R-SUSPICIOUS-EXT', 15, `${susp.size} file(s) with a ransomware-style extension appeared.`);
+    if(hi.size >= s.entropyFiles) rule('R-ENTROPY', 30, `${hi.size} files that are normally not compressed now contain near-random data (possible encryption).`);
+    if(notes.size >= 2) rule('R-RANSOM-NOTE', 35, `${notes.size} files named like ransom notes were created.`);
+    else if(notes.size === 1) rule('R-RANSOM-NOTE', 25, 'A file named like a ransom note was created.');
+    if(del.size >= s.massDelete) rule('R-MASS-DELETE', 20, `${del.size} files were deleted within ${s.windowSeconds} seconds.`);
+    if(decoys.size > 0) rule('R-HONEYPOT', 60, `${decoys.size} decoy file(s) were modified, renamed or deleted. Nothing legitimate should touch them.`);
+    let fin = Math.min(100, points);
+    if(decoys.size > 0) fin = Math.max(fin, 90);
+    fin = Math.round(Math.min(100, fin) * 10) / 10;
+    this.metrics = {modified: mod.size, renamed: ren.size, deleted: del.size, highEntropy: hi.size, score: fin};
+    this.hot = [...dirCount].sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const sev = fin >= 85 ? 4 : fin >= 60 ? 3 : fin >= 35 ? 2 : 0;
+    if(sev < 2){ if(now - this.lastEmit > 60000){ this.lastSev = 0; this.lastRules = new Set(); } return; }
+    // Alert on escalation, every 30 s while activity continues, and whenever a rule fires that the open
+    // alert has not reported yet (for example a decoy touched or a ransom note dropped after the alert).
+    const escalated = sev > this.lastSev, repeat = now - this.lastEmit > 30000;
+    const newRule = rules.some(r => !this.lastRules.has(r));
+    if(!force && !escalated && !repeat && !newRule) return;
+    if(force && !escalated && !newRule && now - this.lastEmit < 5000) return;
+    const affected = [...new Set([...mod, ...ren, ...del, ...susp, ...decoys])].slice(0, 500);
+    this.lastSev = sev; this.lastEmit = now; this.lastRules = new Set([...this.lastRules, ...rules]);
+    this.onDetect({severity: SEV[sev], sevN: sev, score: fin, title: decoys.size ? 'Decoy file triggered' : sev >= 3 ? 'Possible ransomware activity' : 'Suspicious file activity', description: reasons.join(' '), rules, affected});
+  }
+}
+
+/* ================= storage backends ================= */
+class MemBackend {
+  constructor(){ this.kind = 'sandbox'; this.files = new Map(); }
+  async list(){ return [...this.files].map(([path,f]) => ({path, size: f.bytes.length, mtime: f.mtime})); }
+  async read(p){ const f = this.files.get(p); return f ? f.bytes.slice() : null; }
+  async readHead(p, n){ const f = this.files.get(p); return f ? f.bytes.slice(0, n) : null; }
+  async write(p, bytes){ this.files.set(p, {bytes: new Uint8Array(bytes), mtime: Date.now()}); }
+  async remove(p){ this.files.delete(p); }
+  async rename(p, np){ const f = this.files.get(p); if(!f) return; this.files.delete(p); this.files.set(np, f); }
+}
+class FsaBackend {
+  constructor(root){ this.kind = 'fs'; this.root = root; }
+  async list(){
+    const out = []; const walk = async (dir, prefix, depth) => {
+      if(out.length >= MAX_FILES || depth > 8) return;
+      for await (const [name, h] of dir.entries()){
+        if(out.length >= MAX_FILES) return;
+        if(h.kind === 'file'){ try{ const f = await h.getFile(); out.push({path: prefix + name, size: f.size, mtime: f.lastModified}); }catch{} }
+        else if(!name.startsWith('.')) await walk(h, prefix + name + '/', depth + 1);
+      }
+    };
+    await walk(this.root, '', 0); return out;
+  }
+  async dirOf(path, create){ let d = this.root; const parts = path.split('/'); parts.pop(); for(const p of parts) d = await d.getDirectoryHandle(p, {create}); return d; }
+  async read(p){ try{ const d = await this.dirOf(p, false); const fh = await d.getFileHandle(baseName(p)); return new Uint8Array(await (await fh.getFile()).arrayBuffer()); }catch{ return null; } }
+  async readHead(p, n){ try{ const d = await this.dirOf(p, false); const fh = await d.getFileHandle(baseName(p)); return new Uint8Array(await (await fh.getFile()).slice(0, n).arrayBuffer()); }catch{ return null; } }
+  async write(p, bytes){ const d = await this.dirOf(p, true); const fh = await d.getFileHandle(baseName(p), {create: true}); const w = await fh.createWritable(); await w.write(bytes); await w.close(); }
+  async remove(p){ try{ const d = await this.dirOf(p, false); await d.removeEntry(baseName(p)); }catch{} }
+  async rename(p, np){
+    try{ const d = await this.dirOf(p, false); const fh = await d.getFileHandle(baseName(p)); if(fh.move && dirOf(p) === dirOf(np)){ await fh.move(baseName(np)); return; } }catch{}
+    const b = await this.read(p); if(b){ await this.write(np, b); await this.remove(p); }
+  }
+}
+const Store = {
+  root: null, mem: new Map(),
+  async init(){ try{ if(navigator.storage && navigator.storage.getDirectory){ const r = await navigator.storage.getDirectory(); this.root = await r.getDirectoryHandle('ws-objects', {create: true}); } }catch{ this.root = null; } },
+  async has(sha){ if(!this.root) return this.mem.has(sha); try{ await this.root.getFileHandle(sha); return true; }catch{ return false; } },
+  async put(sha, bytes){ if(!this.root){ this.mem.set(sha, bytes); return; } const fh = await this.root.getFileHandle(sha, {create: true}); const w = await fh.createWritable(); await w.write(bytes); await w.close(); },
+  async get(sha){ if(!this.root) return this.mem.get(sha) || null; try{ const fh = await this.root.getFileHandle(sha); return new Uint8Array(await (await fh.getFile()).arrayBuffer()); }catch{ return null; } },
+  async del(sha){ if(!this.root){ this.mem.delete(sha); return; } try{ await this.root.removeEntry(sha); }catch{} }
+};
+const idb = {
+  db: null,
+  async open(){ if(this.db) return this.db; this.db = await new Promise((res, rej) => { const r = indexedDB.open('winshield', 1); r.onupgradeneeded = () => r.result.createObjectStore('h'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); return this.db; },
+  async tx(mode, fn){ try{ const db = await this.open(); return await new Promise((res, rej) => { const t = db.transaction('h', mode); const rq = fn(t.objectStore('h')); t.oncomplete = () => res(rq && rq.result); t.onerror = () => rej(t.error); }); }catch{ return null; } },
+  get(k){ return this.tx('readonly', s => s.get(k)); }, put(k, v){ return this.tx('readwrite', s => s.put(v, k)); }, del(k){ return this.tx('readwrite', s => s.delete(k)); }
+};
+
+/* ================= state ================= */
+let protection = true, emergency = false, selected = null, selPoint = null, logs = [], incidents = lsGet('ws.incidents', []);
+const folders = [];            // {id,name,kind,backend,handle,prev,decoys:{path:sha},baseline,points,connected,count,suppress}
+const folderById = id => folders.find(f => f.id === id);
+const engine = new Engine(onDetect);
+const fullPath = (f, p) => `${f.name}/${p}`;
+
+function logLine(msg, cls=''){ logs.push({t: clock(), msg, cls}); if(logs.length > 300) logs.shift(); renderLog(); }
+function saveFolders(){ lsSet('ws.folders', folders.filter(f => f.kind === 'fs').map(f => ({id: f.id, name: f.name, decoys: f.decoys}))); }
+function savePoints(f){ lsSet('ws.points.' + f.id, f.points); }
+function saveBaseline(f){ lsSet('ws.base.' + f.id, f.baseline); }
+function saveIncidents(){ lsSet('ws.incidents', incidents.slice(0, 100).map(i => ({...i, files: i.files.slice(0, 100), evidence: (i.evidence || []).slice(0, 200)}))); }
+
+/* ================= folders ================= */
+function makeFolder(o){ return {id: o.id || uid(), name: o.name, kind: o.kind, backend: o.backend || null, handle: o.handle || null, prev: null, decoys: o.decoys || {}, baseline: null, points: [], connected: !!o.backend, count: 0, suppress: null, busy: false}; }
+function loadFolderData(f){ f.baseline = lsGet('ws.base.' + f.id, null); f.points = lsGet('ws.points.' + f.id, []); }
+async function connectFolder(f){ f.prev = null; f.connected = true; await pollFolder(f); logLine(`Now watching "${f.name}" (${f.count} files).`, 'ok'); }
+async function addFolderFromHandle(handle, name){
+  for(const f of folders){ if(f.handle && await f.handle.isSameEntry(handle)){ toast('That folder is already protected.'); return f; } }
+  const f = makeFolder({name: name || handle.name, kind: 'fs', backend: new FsaBackend(handle), handle});
+  folders.push(f); await idb.put(f.id, handle); saveFolders(); loadFolderData(f); await connectFolder(f); render(); return f;
+}
+async function addFolder(){
+  if(!window.showDirectoryPicker){ await ask('Folder access is not available', 'This browser cannot open real folders. Use Chrome or Edge on a computer, or try the practice folder.', 'OK', ''); return; }
+  let h; try{ h = await window.showDirectoryPicker({id: 'winshield', mode: 'readwrite'}); }catch{ return; }
+  const f = await addFolderFromHandle(h);
+  if(settings.notify && 'Notification' in window && Notification.permission === 'default'){ try{ Notification.requestPermission(); }catch{} }
+  if(f && Object.keys(f.decoys).length === 0) toast('Folder added. Consider placing decoy files and building a baseline.');
+}
+async function addSandbox(){
+  if(folders.some(f => f.kind === 'sandbox')){ toast('The practice folder is already added.'); return; }
+  const f = makeFolder({name: 'Practice', kind: 'sandbox', backend: new MemBackend()});
+  folders.push(f); await connectFolder(f); render(); toast('Practice folder added (kept in memory, cleared on reload).');
+}
+async function removeFolder(f){
+  if(!(await ask('Stop protecting this folder?', `WinShield will stop watching "${f.name}". Decoy files stay in the folder until you remove them, and recovery points are kept.`))) return;
+  folders.splice(folders.indexOf(f), 1); await idb.del(f.id); saveFolders(); render();
+}
+async function reconnect(f){
+  try{ const p = await f.handle.requestPermission({mode: 'readwrite'}); if(p !== 'granted'){ toast('Permission was not granted.'); return; } }catch{ return; }
+  f.backend = new FsaBackend(f.handle); await connectFolder(f); render();
+}
+async function restoreFolders(){
+  for(const m of lsGet('ws.folders', [])){
+    const h = await idb.get(m.id); if(!h) continue;
+    const f = makeFolder({id: m.id, name: m.name, kind: 'fs', handle: h, decoys: m.decoys}); loadFolderData(f); folders.push(f);
+    let granted = false; try{ granted = (await h.queryPermission({mode: 'readwrite'})) === 'granted'; }catch{}
+    if(granted){ f.backend = new FsaBackend(h); await connectFolder(f); }
+  }
+}
+
+/* ================= monitoring (poll + diff -> events -> engine) ================= */
+async function snapshot(f){ const l = await f.backend.list(); const m = new Map(); l.forEach(x => m.set(x.path, x)); return m; }
+// Takes the polling lock so a background poll cannot overwrite the new baseline of "what exists now".
+async function resync(f){ while(f.busy) await sleep(25); f.busy = true; try{ f.prev = await snapshot(f); f.count = f.prev.size; } finally{ f.busy = false; } }
+async function pollFolder(f){
+  if(!f.connected || !f.backend || f.busy) return; f.busy = true;
+  try{
+    const cur = await snapshot(f); f.count = cur.size;
+    if(!f.prev){ f.prev = cur; return; }
+    const created = [], modified = [], deleted = [];
+    for(const [p, c] of cur){ const o = f.prev.get(p); if(!o) created.push(c); else if(o.size !== c.size || o.mtime !== c.mtime) modified.push(c); }
+    for(const [p, o] of f.prev) if(!cur.has(p)) deleted.push(o);
+    f.prev = cur;
+    const sup = f.suppress && f.suppress.until > Date.now() ? f.suppress : null;
+    const skip = p => sup && (sup.all || p.startsWith(sup.prefix));
+
+    // infer renames: a deleted file and a created file in the same folder that look like the same file
+    const delByName = new Map(), delByKey = new Map();
+    deleted.forEach(d => { delByName.set(d.path, d); delByKey.set(`${dirOf(d.path)}|${d.size}|${d.mtime}`, d); });
+    const renamed = [], realCreated = [], usedDel = new Set();
+    for(const c of created){
+      let m = null; let name = c.path;
+      for(let i = 0; i < 3 && !m; i++){ const j = name.lastIndexOf('.'); if(j <= name.lastIndexOf('/') + 0) break; name = name.slice(0, j); const d = delByName.get(name); if(d && !usedDel.has(d.path)) m = d; }
+      if(!m){ const d = delByKey.get(`${dirOf(c.path)}|${c.size}|${c.mtime}`); if(d && !usedDel.has(d.path)) m = d; }
+      if(m){ usedDel.add(m.path); renamed.push({from: m.path, to: c}); } else realCreated.push(c);
+    }
+    const realDeleted = deleted.filter(d => !usedDel.has(d.path));
+    const evs = [];
+    let sampled = 0; const sample = async p => { if(sampled++ >= 200) return -1; return entropyOf(await f.backend.readHead(p, 65536)); };
+    const now = Date.now(), fid = f.id;
+    const add = async (kind, rel, old, withEntropy) => {
+      if(skip(rel)) return; const ent = withEntropy ? await sample(rel) : -1;
+      evs.push({t: now, fid, rel, path: fullPath(f, rel), oldPath: old ? fullPath(f, old) : null, kind, ext: extOf(rel), oldExt: old ? extOf(old) : null, entropy: ent, honeypot: Object.prototype.hasOwnProperty.call(f.decoys, rel) || (old && Object.prototype.hasOwnProperty.call(f.decoys, old))});
+    };
+    for(const c of realCreated) await add('Created', c.path, null, true);
+    for(const c of modified) await add('Modified', c.path, null, true);
+    for(const r of renamed) await add('Renamed', r.to.path, r.from, true);
+    for(const d of realDeleted) await add('Deleted', d.path, null, false);
+    if(evs.length){
+      const sum = [realCreated.length && `${realCreated.length} created`, modified.length && `${modified.length} modified`, renamed.length && `${renamed.length} renamed`, realDeleted.length && `${realDeleted.length} deleted`].filter(Boolean).join(', ');
+      if(sum) logLine(`${f.name}: ${sum}${evs.length <= 3 ? ' (' + evs.map(e => baseName(e.rel)).join(', ') + ')' : ''}`);
+      for(const e of evs){ if(e.honeypot && e.kind !== 'Created') logLine(`DECOY TOUCHED: ${e.path} was ${e.kind.toLowerCase()}`, 'bad'); engine.process(e); }
+    }
+  }catch(err){ logLine(`Could not read "${f.name}": ${err.message}`, 'bad'); }
+  finally{ f.busy = false; }
+}
+let polling = false;
+async function pollAll(){ if(polling || !protection) return; polling = true; try{ for(const f of folders) await pollFolder(f); }finally{ polling = false; } }
+function loop(){ pollAll().finally(() => setTimeout(loop, 900)); }
+setInterval(() => { if(protection) engine.evaluate(false); render(true); }, 1000);
+
+/* ================= incidents ================= */
+function addAction(inc, a, d){ inc.actions.push({t: clock(), a, d}); }
+function recommendations(inc){
+  const r = [];
+  r.push('Disconnect this PC from Wi-Fi and unplug the network cable to stop the spread, then close the program responsible (Task Manager) or shut the PC down.');
+  r.push('Do not restart the PC or delete anything yet. Save the evidence file from this incident first.');
+  r.push('Compare against your integrity baseline to see exactly which files were changed, deleted, renamed or added.');
+  r.push('Restore affected files from the latest recovery point taken before the incident, then verify them.');
+  r.push('Never pay or contact the attacker until you have checked your recovery points and backups.');
+  r.push('Change passwords for accounts used on this PC from a different, clean device.');
+  if(inc.rules.includes('R-HONEYPOT')) r.push('A decoy file was touched, so this is very likely real ransomware or a script modifying files. Treat it as confirmed until proven otherwise.');
+  return r;
+}
+function notifyUser(inc){
+  if(settings.sound && inc.sevN >= 3){ try{ const c = new (window.AudioContext || window.webkitAudioContext)(); [0, .35, .7].forEach(d => { const o = c.createOscillator(), g = c.createGain(); o.frequency.value = 880; g.gain.value = .15; o.connect(g); g.connect(c.destination); o.start(c.currentTime + d); o.stop(c.currentTime + d + .2); }); }catch{} }
+  if(settings.notify && 'Notification' in window && Notification.permission === 'granted'){ try{ new Notification('WinShield: ' + inc.title, {body: `${inc.severity} severity, score ${inc.score}`}); }catch{} }
+}
+function onDetect(res){
+  const now = Date.now(); let inc = incidents.find(i => i.status === 'Open' && now - i.tms < 120000);
+  if(inc){
+    const escal = res.sevN > inc.sevN; const added = res.rules.filter(r => !inc.rules.includes(r)); inc.sevN = Math.max(inc.sevN, res.sevN); inc.severity = SEV[inc.sevN]; inc.score = Math.max(inc.score, res.score); inc.desc = res.description;
+    inc.rules = [...new Set([...inc.rules, ...res.rules])]; inc.files = [...new Set([...inc.files, ...res.affected])].slice(0, 500);
+    if(res.title === 'Decoy file triggered') inc.title = res.title;
+    if(escal){ addAction(inc, 'Alert escalated', `Now ${inc.severity}, score ${inc.score}.`); notifyUser(inc); logLine(`Incident escalated to ${inc.severity}: ${inc.title}`, 'bad'); }
+    else if(added.length){ addAction(inc, 'Alert updated', `New evidence: ${added.join(', ')}.`); logLine(`Incident updated with new evidence: ${added.join(', ')}`, 'bad'); }
+  } else {
+    inc = {id: uid(), time: stamp(now), tms: now, severity: res.severity, sevN: res.sevN, score: res.score, title: res.title, desc: res.description, rules: res.rules, files: res.affected, status: 'Open', actions: [], evidence: engine.events.slice(-200).map(e => ({t: new Date(e.t).toISOString(), kind: e.kind, path: e.path, oldPath: e.oldPath, entropy: Math.round(e.entropy*100)/100, decoy: e.honeypot}))};
+    incidents.unshift(inc); selected = inc.id;
+    addAction(inc, 'Alert raised', `${inc.severity} severity, score ${inc.score}. Rules: ${inc.rules.join(', ')}.`);
+    addAction(inc, 'Evidence preserved', `Captured ${inc.evidence.length} file events and ${inc.files.length} affected file paths. Use "Save evidence" to download them.`);
+    notifyUser(inc); logLine(`INCIDENT: ${inc.title} (${inc.severity}, score ${inc.score})`, 'bad');
+  }
+  saveIncidents(); render();
+}
+
+/* ================= decoys ================= */
+const DECOY_NAMES = ['!0_Account_Passwords_Backup.xlsx', '!0_Tax_Records_2025.docx', 'zzz_Private_Photos_Archive.pdf'];
+function decoyContent(name){ let s = `WinShield decoy file\nName: ${name}\nThis file is a tripwire for ransomware protection. It contains no real data.\nPlease do not open, edit, move or delete it. Remove decoys from the WinShield Folders tab.\n\n`; for(let i = 0; i < 400; i++) s += `Decoy record ${String(i).padStart(4,'0')}: confidential entry placeholder text for monitoring purposes only.\n`; return new TextEncoder().encode(s); }
+async function deployDecoys(f, extra){
+  f.suppress = {all: true, until: Date.now() + 60000};
+  const list = await f.backend.list(); const subs = [...new Set(list.map(x => x.path.split('/')[0]).filter((n, i) => list[i].path.includes('/') && !n.startsWith('.') && n !== 'WinShield-selftest'))].sort().slice(0, 3);
+  const targets = [['', DECOY_NAMES], ...subs.map(s => [s + '/', [DECOY_NAMES[0], DECOY_NAMES[2]]]), ...(extra || [])];
+  let created = 0; const exist = new Set(list.map(x => x.path));
+  for(const [dir, names] of targets) for(const name of names){
+    const p = dir + name; try{ if(!exist.has(p)){ await f.backend.write(p, decoyContent(name)); created++; } f.decoys[p] = await sha256(await f.backend.read(p)); }catch{}
+  }
+  await resync(f); f.suppress = null; saveFolders(); return created;
+}
+async function decoyStatus(){
+  const rows = [];
+  for(const f of folders) for(const [p, sha] of Object.entries(f.decoys)){
+    let st = 'Missing'; if(f.connected){ const b = await f.backend.read(p); st = b ? ((await sha256(b)) === sha ? 'Intact' : 'Modified') : 'Missing'; } else st = 'Unreadable';
+    rows.push({status: st, path: fullPath(f, p)});
+  }
+  return rows;
+}
+async function removeDecoys(){
+  if(!(await ask('Remove decoy files?', 'Without decoys, WinShield loses its fastest ransomware tripwire. Remove them anyway?'))) return;
+  let n = 0; for(const f of folders){ f.suppress = {all: true, until: Date.now() + 4000}; for(const p of Object.keys(f.decoys)){ if(f.connected){ await f.backend.remove(p); n++; } } f.decoys = {}; if(f.connected) await resync(f); } saveFolders();
+  $('#folderMsg').textContent = `Removed ${n} decoy file(s).`; render();
+}
+
+/* ================= integrity ================= */
+async function hashAll(f, label){
+  const list = await f.backend.list(); const files = {}; let i = 0, skipped = 0;
+  for(const it of list){
+    if(++i % 20 === 0){ $('#intProgress').textContent = `${label}: ${i} of ${list.length} files...`; await sleep(0); }
+    if(it.size > MAX_HASH){ files[it.path] = {sha: null, size: it.size}; skipped++; continue; }
+    const b = await f.backend.read(it.path); if(!b) continue; files[it.path] = {sha: await sha256(b), size: b.length};
+  }
+  $('#intProgress').textContent = ''; return {files, skipped};
+}
+async function buildBaseline(f){
+  const {files, skipped} = await hashAll(f, 'Hashing'); f.baseline = {t: Date.now(), files}; saveBaseline(f);
+  $('#folderMsg').textContent = `Baseline for "${f.name}": ${Object.keys(files).length} files${skipped ? `, ${skipped} too large to hash` : ''}.`; render();
+}
+async function compareBaseline(f){
+  if(!f.baseline){ toast('Build a baseline first.'); return; }
+  const {files: cur} = await hashAll(f, 'Comparing'); const base = f.baseline.files; const rows = []; let same = 0;
+  const gone = [], fresh = [];
+  for(const [p, b] of Object.entries(base)){ if(!cur[p]) gone.push(p); else if(b.sha && cur[p].sha && b.sha !== cur[p].sha) rows.push({kind: 'Modified', path: p, detail: `Hash changed: ${b.sha.slice(0,10)}... to ${cur[p].sha.slice(0,10)}...`}); else same++; }
+  for(const p of Object.keys(cur)) if(!base[p]) fresh.push(p);
+  const freshBySha = new Map(); fresh.forEach(p => { if(cur[p].sha) freshBySha.set(cur[p].sha, p); });
+  const usedNew = new Set();
+  for(const p of gone){ const m = base[p].sha && freshBySha.get(base[p].sha); if(m && !usedNew.has(m)){ usedNew.add(m); rows.push({kind: 'Renamed', path: p, detail: `Now ${m} (same content)`}); } else rows.push({kind: 'Deleted', path: p, detail: 'In the baseline but missing now'}); }
+  for(const p of fresh) if(!usedNew.has(p)) rows.push({kind: 'New', path: p, detail: `Not in the baseline (${cur[p].size} bytes)`});
+  $('#intSummary').textContent = rows.length ? `${rows.length} change(s) since ${stamp(f.baseline.t)}; ${same} file(s) unchanged.` : `No changes. All ${same} files match the baseline.`;
+  $('#intBody').innerHTML = rows.slice(0, 500).map(r => `<tr><td><span class="pill ${r.kind==='Renamed'?'Warning':r.kind==='New'?'New':'High'}">${r.kind}</span></td><td>${esc(r.path)}</td><td>${esc(r.detail)}</td></tr>`).join('');
+}
+
+/* ================= recovery points ================= */
+async function createPoint(f, o={}){
+  const exclude = o.exclude || new Set(); const list = await f.backend.list(); const files = {}; let stored = 0, count = 0, skipped = 0, i = 0;
+  for(const it of list){
+    if(++i % 10 === 0){ $('#recMsg').textContent = `Copying ${i} of ${list.length} files...`; await sleep(0); }
+    if(exclude.has(it.path)) continue; if(it.size > MAX_COPY){ skipped++; continue; }
+    const b = await f.backend.read(it.path); if(!b) continue; const sha = await sha256(b);
+    if(!(await Store.has(sha))){ await Store.put(sha, b); stored += b.length; }
+    files[it.path] = {sha, size: b.length}; count++;
+  }
+  const p = {id: uid(), t: Date.now(), fid: f.id, fname: f.name, note: o.note || 'Manual', files, count, stored, skipped, tainted: !!(o.tainted || incidents.some(x => x.status === 'Open'))};
+  f.points.push(p); savePoints(f); selPoint = p.id; return p;
+}
+const allPoints = () => folders.flatMap(f => f.points).sort((a, b) => a.t - b.t);
+const pointOwner = p => folders.find(f => f.id === p.fid);
+async function verifyPoint(p){ let ok = 0, bad = 0; for(const [path, m] of Object.entries(p.files)){ const b = await Store.get(m.sha); if(b && (await sha256(b)) === m.sha) ok++; else bad++; } return {ok, bad}; }
+async function restorePoint(p, f, toSub){
+  const prefix = toSub ? `restored-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}/` : '';
+  f.suppress = {all: true, until: Date.now() + 3600000}; let restored = 0, kept = 0, verified = 0, same = 0, failed = 0; const evidenceNote = [];
+  try{
+    for(const [path, m] of Object.entries(p.files)){
+      const target = prefix + path; const cur = await f.backend.read(target);
+      if(cur && (await sha256(cur)) === m.sha){ same++; continue; }
+      const obj = await Store.get(m.sha); if(!obj){ failed++; continue; }
+      if(cur && !toSub){ try{ const root = await navigator.storage.getDirectory(); const ev = await root.getDirectoryHandle('ws-evidence', {create: true}); const fh = await ev.getFileHandle(`${Date.now()}-${uid()}-${baseName(path)}.damaged`, {create: true}); const w = await fh.createWritable(); await w.write(cur); await w.close(); kept++; }catch{} }
+      await f.backend.write(target, obj); restored++;
+      const back = await f.backend.read(target); if(back && (await sha256(back)) === m.sha) verified++; else failed++;
+    }
+  } finally { await resync(f); f.suppress = {all: true, until: Date.now() + 2500}; }
+  return {restored, verified, same, failed, kept, prefix};
+}
+async function prunePoints(){
+  let removed = 0; for(const f of folders){ if(f.points.length > 5){ f.points = f.points.slice(-5); savePoints(f); removed++; } }
+  const keep = new Set(allPoints().flatMap(p => Object.values(p.files).map(m => m.sha)));
+  if(Store.root){ for await (const [name] of Store.root.entries()) if(!keep.has(name)) await Store.del(name); } else for(const k of [...Store.mem.keys()]) if(!keep.has(k)) Store.mem.delete(k);
+  $('#recMsg').textContent = removed ? 'Old recovery points removed. The newest 5 per folder were kept.' : 'Nothing to clean up. Only the newest 5 points per folder are kept.'; render();
+}
+
+/* ================= self-test ================= */
+const WORDS = 'invoice quarterly budget report customer account payment summary project schedule meeting notes review proposal contract budget forecast revenue expense balance ledger client order shipment delivery status update draft final approved pending'.split(' ');
+function sampleText(n){ let s = ''; while(s.length < n) s += WORDS[Math.floor(Math.random() * WORDS.length)] + (Math.random() < .12 ? '.\n' : ' '); return new TextEncoder().encode(s); }
+function randomBytes(n){ const b = new Uint8Array(n); for(let o = 0; o < n; o += 65536) crypto.getRandomValues(b.subarray(o, Math.min(n, o + 65536))); return b; }
+const TEST_DIR = 'WinShield-selftest/';
+const tf = () => folders.find(f => f.connected);
+async function selfTest(){
+  const f = tf(); if(!f){ toast('Add a protected folder first.'); return; }
+  if(!protection){ toast('Turn protection on first.'); return; }
+  if(!(await ask('Run the safe self-test?', `WinShield will create 60 small text files in "${f.name}/WinShield-selftest", then overwrite them with random data, rename some to .locked, add a ransom-note file and touch a decoy. Only files inside that folder are changed. You can remove them afterwards with "Clean up self-test files".\n\nRun it?`))) return;
+  $('#btnTest').disabled = true; showTab('Dashboard');
+  try{
+    f.suppress = {all: true, until: Date.now() + 120000};   // our own setup writes are not an attack
+    const exts = ['.txt', '.csv', '.md', '.log', '.json', '.html']; const names = [];
+    for(let i = 1; i <= 60; i++){ const n = `${TEST_DIR}Invoice_${String(i).padStart(3,'0')}${exts[i % exts.length]}`; names.push(n); await f.backend.write(n, sampleText(4096 + (i % 5) * 1024)); }
+    const decoy = `${TEST_DIR}!0_Tax_Records_2025.docx`; await f.backend.write(decoy, decoyContent('!0_Tax_Records_2025.docx')); f.decoys[decoy] = await sha256(await f.backend.read(decoy)); saveFolders();
+    await resync(f); f.suppress = null; logLine('Self-test: 60 sample files and a decoy created. Starting the simulated attack...', 'ok'); await sleep(1500);
+    logLine('Self-test: encrypting the first 14 files with random data...'); for(const n of names.slice(0, 14)) await f.backend.write(n, randomBytes((await f.backend.read(n)).length)); await sleep(2600);
+    logLine('Self-test: renaming 22 files to .locked...'); for(const n of names.slice(14, 36)) await f.backend.rename(n, n + '.locked'); await sleep(2600);
+    logLine('Self-test: touching the decoy file...'); await f.backend.write(decoy, randomBytes(4096)); await sleep(2200);
+    logLine('Self-test: dropping a ransom note...'); await f.backend.write(TEST_DIR + 'HOW_TO_DECRYPT_YOUR_FILES.txt', new TextEncoder().encode('Your files are encrypted. (WinShield self-test note, not real)')); await sleep(2500);
+    logLine('Self-test finished. Check the Incidents tab. Use "Clean up self-test files" when done.', 'ok');
+  }catch(err){ logLine('Self-test failed: ' + err.message, 'bad'); }
+  $('#btnTest').disabled = false; render();
+}
+async function cleanSelfTest(){
+  let n = 0; for(const f of folders){ if(!f.connected) continue; f.suppress = {prefix: TEST_DIR, until: Date.now() + 6000};
+    for(const it of await f.backend.list()) if(it.path.startsWith(TEST_DIR)){ await f.backend.remove(it.path); n++; }
+    for(const p of Object.keys(f.decoys)) if(p.startsWith(TEST_DIR)) delete f.decoys[p];
+    await resync(f); if(f.kind === 'fs'){ try{ await f.handle.removeEntry('WinShield-selftest', {recursive: true}); }catch{} } saveFolders(); }
+  engine.reset(); toast(n ? `Removed ${n} self-test file(s).` : 'No self-test files found.'); render();
+}
+
+/* ================= emergency ================= */
+async function activateEmergency(){
+  if(!folders.some(f => f.connected)){ toast('Add a protected folder first.'); return; }
+  if(!(await ask('Activate emergency protection?', 'WinShield will save the evidence and copy every file that has not been touched yet into a recovery point, so a clean copy exists before more files are lost.\n\nIt cannot stop the attacking program from a browser: disconnect the network and close the program or shut the PC down afterwards.\n\nContinue?'))) return;
+  let inc = incidents.find(i => i.status === 'Open');
+  if(!inc){ inc = {id: uid(), time: stamp(Date.now()), tms: Date.now(), severity: 'High', sevN: 3, score: 100, title: 'Emergency protection activated manually', desc: 'The user activated emergency protection from the dashboard.', rules: ['M-MANUAL'], files: [], status: 'Open', actions: [], evidence: []}; incidents.unshift(inc); selected = inc.id; }
+  emergency = true; addAction(inc, 'Emergency protection', 'Emergency protection activated.'); render();
+  for(const f of folders.filter(x => x.connected)){
+    const affected = new Set(inc.files.filter(p => p.startsWith(f.name + '/')).map(p => p.slice(f.name.length + 1)));
+    const p = await createPoint(f, {note: 'Emergency (untouched files only)', exclude: affected, tainted: true});
+    addAction(inc, 'Recovery point created', `${p.count} untouched file(s) in "${f.name}" copied (${(p.stored/1024).toFixed(0)} KB new data).`);
+  }
+  inc.sevN = Math.max(inc.sevN, 3); saveIncidents(); $('#recMsg').textContent = ''; render();
+  await ask('Emergency protection is on', 'Do these now:\n\n1. Disconnect from Wi-Fi and unplug the network cable.\n2. Close the suspicious program in Task Manager, or shut the PC down.\n3. Save the evidence file from the Incidents tab.\n4. Do not pay or contact the attacker.', 'OK', '');
+}
+function releaseEmergency(){ emergency = false; const inc = incidents.find(i => i.status === 'Open'); if(inc) addAction(inc, 'Emergency protection released', 'Released by the user.'); saveIncidents(); render(); }
+
+/* ================= reports ================= */
+function reportHtml(inc){
+  const rows = inc.actions.map(a => `<tr><td>${esc(a.t)}</td><td>${esc(a.a)}</td><td>${esc(a.d)}</td></tr>`).join('');
+  return `<!doctype html><meta charset="utf-8"><title>WinShield incident report</title><body style="font-family:Segoe UI,sans-serif;max-width:820px;margin:24px auto;color:#1b2330"><h1>WinShield incident report</h1><p><b>${esc(inc.title)}</b> - ${esc(inc.severity)} (score ${inc.score}) - ${esc(inc.status)}<br>Detected ${esc(inc.time)}<br>Process: not visible to the browser edition</p><p>${esc(inc.desc)}</p><p>Rules fired: ${esc(inc.rules.join(', '))}</p><h2>Defensive actions</h2><table border="1" cellpadding="6" style="border-collapse:collapse"><tr><th>Time</th><th>Action</th><th>Detail</th></tr>${rows}</table><h2>Affected files (${inc.files.length})</h2><ul>${inc.files.slice(0, 500).map(f => `<li><code>${esc(f)}</code></li>`).join('')}</ul><h2>Recommendations</h2><ol>${recommendations(inc).map(r => `<li>${esc(r)}</li>`).join('')}</ol></body>`;
+}
+function reportCsv(inc){ const q = s => '"' + String(s).replace(/"/g, '""') + '"'; return ['time,action,detail', ...inc.actions.map(a => [a.t, a.a, a.d].map(q).join(',')), '', 'affected_file', ...inc.files.map(q)].join('\r\n'); }
+
+/* ================= health (browser protection checks) ================= */
+async function healthChecks(){
+  const c = []; const add = (s, t, d, r) => c.push([s, t, d, r || 'No action needed.']);
+  add(window.isSecureContext ? 'Pass' : 'Fail', 'Secure connection', window.isSecureContext ? 'This page is served over HTTPS.' : 'This page is not in a secure context.', 'Open WinShield over https://.');
+  add(window.showDirectoryPicker ? 'Pass' : 'Warning', 'Real folder access', window.showDirectoryPicker ? 'Your browser can watch real folders you choose.' : 'This browser cannot open real folders.', 'Use Chrome or Edge on a computer to protect real folders.');
+  add(crypto && crypto.subtle ? 'Pass' : 'Fail', 'SHA-256 hashing', 'Web Crypto is available for file fingerprints.', 'Use a current browser over HTTPS.');
+  add(Store.root ? 'Pass' : 'Warning', 'Private storage for recovery points', Store.root ? 'Origin private storage is available.' : 'Recovery points are kept in memory only and vanish on reload.', 'Use a current browser.');
+  let persisted = false; try{ persisted = await navigator.storage.persisted(); }catch{}
+  add(persisted ? 'Pass' : 'Warning', 'Persistent storage', persisted ? 'The browser will not clear WinShield data automatically.' : 'The browser may clear recovery points when disk space is low.', 'Install the page as an app or bookmark it; some browsers then grant persistence.');
+  const np = 'Notification' in window ? Notification.permission : 'unsupported';
+  add(np === 'granted' ? 'Pass' : np === 'denied' ? 'Fail' : 'Warning', 'Desktop notifications', `Notification permission: ${np}.`, 'Allow notifications for this site so alerts reach you when the tab is in the background.');
+  try{ const e = await navigator.storage.estimate(); c.push(['Info', 'Storage used', `${((e.usage||0)/MB).toFixed(1)} MB of ${((e.quota||0)/MB/1024).toFixed(1)} GB available to this site.`, 'Use "Clean up old points" on the Recovery tab to free space.']); }catch{}
+  const live = folders.filter(f => f.connected);
+  add(protection && live.length ? 'Pass' : 'Warning', 'Monitoring', protection ? `${live.length} folder(s) are being watched.` : 'Protection is turned off.', 'Add a folder and keep protection on.');
+  add(live.length && live.every(f => f.baseline) ? 'Pass' : 'Warning', 'Integrity baseline', live.length && live.every(f => f.baseline) ? 'Every protected folder has a baseline.' : 'At least one folder has no baseline.', 'Build a baseline while you know your files are clean.');
+  const ds = await decoyStatus(); const bad = ds.filter(d => d.status !== 'Intact').length;
+  add(ds.length && !bad ? 'Pass' : ds.length ? 'Fail' : 'Warning', 'Decoy files', ds.length ? (bad ? `${bad} decoy file(s) are modified or missing.` : `${ds.length} decoy file(s) intact.`) : 'No decoy files placed.', ds.length ? 'Investigate the decoy that changed.' : 'Place decoy files on the Folders tab.');
+  const pts = allPoints(); const fresh = pts.length && Date.now() - pts[pts.length-1].t < 86400000;
+  add(fresh ? 'Pass' : 'Warning', 'Recent recovery point', pts.length ? `Latest point: ${stamp(pts[pts.length-1].t)}.` : 'No recovery points yet.', 'Create a recovery point at least once a day.');
+  return c;
+}
+async function runCheck(){
+  $('#healthMsg').textContent = 'Checking...'; const c = await healthChecks();
+  const p = c.filter(x => x[0]==='Pass').length, w = c.filter(x => x[0]==='Warning').length, fl = c.filter(x => x[0]==='Fail').length;
+  const score = Math.round((p + w*.5) / Math.max(1, p + w + fl) * 100);
+  $('#score').textContent = score; $('#score').style.color = score >= 75 ? 'var(--safe)' : score >= 50 ? 'var(--warn)' : 'var(--danger)';
+  $('#grade').textContent = score >= 90 ? 'A' : score >= 75 ? 'B' : score >= 60 ? 'C' : score >= 40 ? 'D' : 'F';
+  $('#healthMsg').textContent = `Check finished: ${p} passed, ${w} warnings, ${fl} failed.`;
+  $('#checks').innerHTML = c.map(x => `<div style="display:flex;gap:14px;padding:12px 14px;border-bottom:1px solid var(--row)"><div style="width:72px"><span class="pill ${x[0]}">${x[0]}</span></div><div><b>${esc(x[1])}</b><div>${esc(x[2])}</div><div class="hint">${esc(x[3])}</div></div></div>`).join('');
+}
+
+/* ================= tabs & render ================= */
+const TABS = ['Dashboard','Incidents','Folders and integrity','Recovery','System health','Settings'];
+let currentTab = 'Dashboard';
+TABS.forEach(t => { const b = document.createElement('button'); b.textContent = t; b.setAttribute('role','tab'); b.onclick = () => showTab(t); $('#tabs').appendChild(b); });
+function showTab(n){ currentTab = n; $$('#tabs button').forEach(b => b.setAttribute('aria-selected', b.textContent === n)); $$('section[data-tab]').forEach(s => s.classList.toggle('hidden', s.dataset.tab !== n)); render(); if(n === 'Folders and integrity') renderDecoys(); }
+function threatLevel(){ if(incidents.some(i => i.status==='Open' && i.sevN>=4)) return 'Critical'; if(incidents.some(i => i.status==='Open' && i.sevN>=3)) return 'High'; if(engine.metrics.score >= 35) return 'Elevated'; return 'Quiet'; }
+function renderLog(){ const el = $('#log'); if(!el) return; const stick = el.scrollTop + el.clientHeight >= el.scrollHeight - 30; el.innerHTML = logs.map(l => `<div class="${l.cls}">[${l.t}] ${esc(l.msg)}</div>`).join('') || '<div class="hint">Waiting for activity...</div>'; if(stick) el.scrollTop = el.scrollHeight; }
+async function renderDecoys(){ const rows = await decoyStatus(); $('#decoyBody').innerHTML = rows.map(r => `<tr><td><span class="pill ${r.status}">${r.status}</span></td><td>${esc(r.path)}</td></tr>`).join('') || '<tr><td colspan="2" class="hint">No decoy files placed yet.</td></tr>'; }
+let renderBusy = false;
+function render(light){
+  const live = folders.filter(f => f.connected), open = incidents.filter(i => i.status === 'Open');
+  $('#protDot').style.background = emergency ? 'var(--danger)' : protection ? 'var(--safe)' : 'var(--off)';
+  $('#protTitle').textContent = emergency ? 'EMERGENCY PROTECTION ACTIVE' : protection ? (live.length ? 'Protection is on' : 'Protection is on, but no folder is protected yet') : 'Protection is off';
+  $('#protSub').textContent = protection ? (live.length ? `Watching ${live.length} folder(s), ${live.reduce((a, f) => a + f.count, 0)} files. Keep this page open.` : 'Choose a folder to start watching it.') : 'Nothing is being watched.';
+  $('#btnToggle').textContent = protection ? 'Turn protection off' : 'Turn protection on';
+  const lvl = threatLevel(); $('#threatPill').textContent = lvl; $('#threatPill').className = 'pill ' + lvl;
+  $('#tOpen').textContent = open.length; $('#tMod').textContent = engine.metrics.modified; $('#tRen').textContent = engine.metrics.renamed; $('#tEnt').textContent = engine.metrics.highEntropy; $('#tFolders').textContent = live.length;
+  $$('.winsec').forEach(e => e.textContent = settings.windowSeconds);
+  $('#btnEmerg').disabled = emergency; $('#btnRelease').disabled = !emergency;
+  $('#startCard').style.display = folders.length ? 'none' : '';
+  const b = $('#banner');
+  if(emergency){ b.className = 'banner emerg show'; b.textContent = 'Emergency protection is active. Disconnect the network and close or shut down the suspicious program.'; }
+  else if(open.length){ const i = open[0]; b.className = 'banner alert show'; b.textContent = `ALERT: ${i.title} (${i.severity}, ${i.status}). Open the Incidents tab for details.`; }
+  else b.className = 'banner';
+  document.title = open.some(i => i.sevN >= 3) ? '(!) WinShield ALERT' : 'WinShield - Anti-Ransomware';
+  $('#hotBody').innerHTML = engine.hot.map(h => `<tr><td>${esc(h[0] || '(top level)')}</td><td>${h[1]}</td></tr>`).join(''); $('#hotEmpty').style.display = engine.hot.length ? 'none' : '';
+  renderLog();
+  if(light === true && currentTab !== 'Dashboard') return;
+
+  $('#incBody').innerHTML = incidents.map(i => `<tr class="click ${selected===i.id?'sel':''}" data-i="${i.id}"><td>${esc(i.time)}</td><td><span class="pill ${i.severity}">${i.severity}</span></td><td>${esc(i.title)}</td><td>${i.score}</td><td>${i.status}</td></tr>`).join('');
+  $('#incEmpty').style.display = incidents.length ? 'none' : '';
+  $$('#incBody tr').forEach(tr => tr.onclick = () => { selected = tr.dataset.i; render(); });
+  const inc = incidents.find(i => i.id === selected); $('#incDetail').style.display = inc ? '' : 'none';
+  if(inc){
+    $('#incTitle').textContent = `${inc.title} - ${inc.severity}`; $('#incDesc').textContent = inc.desc; $('#incRules').textContent = inc.rules.join(', ');
+    $('#actBody').innerHTML = inc.actions.map(a => `<tr><td>${esc(a.t)}</td><td><b>${esc(a.a)}</b></td><td>${esc(a.d)}</td></tr>`).join('');
+    $('#affCount').textContent = inc.files.length; $('#fileList').innerHTML = inc.files.slice(0, 300).map(f => `<li>${esc(f)}</li>`).join('');
+    $('#recs').innerHTML = recommendations(inc).map(r => `<li>${esc(r)}</li>`).join('');
+  }
+  $('#folderBody').innerHTML = folders.map((f, i) => `<tr><td><b>${esc(f.name)}</b><span class="tag">${f.kind === 'fs' ? 'real folder' : 'in memory'}</span></td><td>${f.count}</td><td>${f.connected ? '<span class="pill Pass">Watching</span>' : '<span class="pill Warning">Needs permission</span>'}</td><td>${f.connected ? '' : `<button class="btn" data-rc="${i}">Reconnect</button>`}<button class="btn" data-rm="${i}">Remove</button></td></tr>`).join('');
+  $('#folderEmpty').style.display = folders.length ? 'none' : '';
+  $$('[data-rc]').forEach(b => b.onclick = () => reconnect(folders[+b.dataset.rc])); $$('[data-rm]').forEach(b => b.onclick = () => removeFolder(folders[+b.dataset.rm]));
+  const bs = folders.filter(f => f.baseline); $('#baseText').textContent = bs.length ? bs.map(f => `${f.name}: ${Object.keys(f.baseline.files).length} files, built ${stamp(f.baseline.t)}`).join(' | ') : 'No baseline yet. Build one while you know your files are clean.';
+  const pts = allPoints(); if(!selPoint && pts.length) selPoint = pts[pts.length - 1].id;
+  $('#recStatus').textContent = pts.length ? `${pts.length} recovery point(s). Latest: ${stamp(pts[pts.length-1].t)}.` : 'No recovery points yet.';
+  $('#pointBody').innerHTML = pts.slice().reverse().map(p => `<tr class="click ${selPoint===p.id?'sel':''}" data-p="${p.id}"><td>${stamp(p.t)}</td><td>${esc(p.fname)}</td><td>${esc(p.note)}</td><td>${p.count}</td><td>${p.stored > MB ? (p.stored/MB).toFixed(1) + ' MB' : Math.round(p.stored/1024) + ' KB'}</td><td>${p.tainted ? 'Created during an incident' : 'OK'}${p.skipped ? ` (${p.skipped} large file(s) skipped)` : ''}</td></tr>`).join('');
+  $$('#pointBody tr').forEach(tr => tr.onclick = () => { selPoint = tr.dataset.p; render(); });
+  for(const k in DEFAULTS){ const el = $('#s_' + k); if(el && document.activeElement !== el) el.value = settings[k]; }
+  $('#setNotify').checked = settings.notify; $('#setSound').checked = settings.sound;
+}
+
+/* ================= wiring ================= */
+const withBusy = fn => async (...a) => { try{ await fn(...a); }catch(err){ toast('Something went wrong: ' + err.message); logLine('Error: ' + err.message, 'bad'); } };
+$('#btnToggle').onclick = () => { protection = !protection; logLine(protection ? 'Protection turned on' : 'Protection turned off'); if(protection) folders.forEach(f => { f.prev = null; }); engine.reset(); render(); };
+$('#btnAdd').onclick = $('#btnAdd2').onclick = withBusy(addFolder);
+$('#btnSandbox').onclick = $('#btnSandbox2').onclick = withBusy(addSandbox);
+$('#btnTest').onclick = withBusy(selfTest); $('#btnClean').onclick = withBusy(cleanSelfTest);
+$('#btnEmerg').onclick = withBusy(activateEmergency); $('#btnRelease').onclick = releaseEmergency;
+$$('[data-act]').forEach(b => b.onclick = () => { const inc = incidents.find(i => i.id === selected); if(!inc) return; if(b.dataset.act === 'false'){ inc.status = 'FalsePositive'; addAction(inc, 'Marked false positive', 'You marked this incident as a false positive.'); } else { inc.status = 'Resolved'; addAction(inc, 'Resolved', 'You marked this incident as resolved.'); } saveIncidents(); render(); });
+$('#btnGoRecovery').onclick = () => showTab('Recovery');
+const curInc = () => incidents.find(i => i.id === selected);
+$('#btnReport').onclick = () => { const i = curInc(); if(i) download('winshield-incident-report.html', reportHtml(i), 'text/html'); };
+$('#btnCsv').onclick = () => { const i = curInc(); if(i) download('winshield-incident-report.csv', reportCsv(i), 'text/csv'); };
+$('#btnEvidence').onclick = () => { const i = curInc(); if(i) download('winshield-evidence.json', JSON.stringify({incident: {id: i.id, time: i.time, title: i.title, severity: i.severity, score: i.score, rules: i.rules, description: i.desc}, actions: i.actions, affectedFiles: i.files, events: i.evidence}, null, 2), 'application/json'); };
+$('#btnDeploy').onclick = withBusy(async () => { let n = 0; for(const f of folders.filter(x => x.connected)) n += await deployDecoys(f); $('#folderMsg').textContent = `${n} decoy file(s) placed. Nothing legitimate should ever touch them.`; render(); renderDecoys(); });
+$('#btnRemoveDecoys').onclick = withBusy(async () => { await removeDecoys(); renderDecoys(); });
+$('#btnBase').onclick = withBusy(async () => { for(const f of folders.filter(x => x.connected)) await buildBaseline(f); });
+$('#btnCompare').onclick = withBusy(async () => { $('#intBody').innerHTML = ''; const f = folders.find(x => x.connected && x.baseline); if(!f){ toast('Build a baseline first.'); return; } await compareBaseline(f); });
+$('#btnPoint').onclick = withBusy(async () => { const f = tf(); if(!f){ toast('Add a protected folder first.'); return; } const p = await createPoint(f, {note: 'Manual'}); $('#recMsg').textContent = `Recovery point created: ${p.count} files, ${(p.stored/1024).toFixed(0)} KB of new data (identical content is stored once).`; render(); });
+const selP = () => allPoints().find(p => p.id === selPoint);
+$('#btnVerify').onclick = withBusy(async () => { const p = selP(); if(!p){ toast('Select a recovery point.'); return; } const r = await verifyPoint(p); $('#recMsg').textContent = r.bad ? `${r.bad} stored file(s) failed verification. This point is damaged or was tampered with.` : `Verified ${r.ok} files against their SHA-256 hashes. No tampering found.`; });
+$('#btnRestoreSub').onclick = withBusy(async () => { const p = selP(), f = p && pointOwner(p); if(!p || !f || !f.connected){ toast('Select a recovery point of a connected folder.'); return; } const r = await restorePoint(p, f, true); $('#recMsg').textContent = `Restored ${r.restored} files into "${r.prefix}" and verified ${r.verified} against their hashes${r.failed ? `; ${r.failed} failed` : ''}.`; });
+$('#btnRestore').onclick = withBusy(async () => { const p = selP(), f = p && pointOwner(p); if(!p || !f || !f.connected){ toast('Select a recovery point of a connected folder.'); return; }
+  if(!(await ask('Restore over originals?', `Files that differ from this recovery point will be replaced. Damaged versions are kept as evidence in this browser's private storage, and every restored file is verified against its recorded hash.\n\nContinue?`))) return;
+  const r = await restorePoint(p, f, false); $('#recMsg').textContent = `Restored ${r.restored} file(s), verified ${r.verified}, ${r.same} already correct${r.kept ? `, ${r.kept} damaged version(s) kept as evidence` : ''}${r.failed ? `, ${r.failed} FAILED verification` : ''}.`; });
+$('#btnPrune').onclick = withBusy(prunePoints);
+$('#btnScan').onclick = withBusy(runCheck);
+const readSettings = () => { const s = {...settings}; for(const k in DEFAULTS){ const el = $('#s_' + k); if(el) s[k] = Number(el.value); } s.notify = $('#setNotify').checked; s.sound = $('#setSound').checked; return clampSettings(s); };
+$('#btnSave').onclick = () => { settings = readSettings(); lsSet('ws.settings', settings); toast('Settings saved.'); render(); };
+$('#btnDefaults').onclick = () => { settings = clampSettings({}); lsSet('ws.settings', settings); toast('Defaults restored.'); render(); };
+$('#setNotify').onchange = async e => { if(e.target.checked && 'Notification' in window && Notification.permission === 'default'){ try{ await Notification.requestPermission(); }catch{} } settings.notify = e.target.checked; lsSet('ws.settings', settings); };
+$('#setSound').onchange = e => { settings.sound = e.target.checked; lsSet('ws.settings', settings); };
+document.addEventListener('visibilitychange', () => { if(document.hidden) logLine('This tab is in the background: the browser slows monitoring until you return.'); });
+
+(async function start(){
+  await Store.init(); showTab('Dashboard'); logLine('WinShield started.', 'ok');
+  await restoreFolders(); render(); loop();
+})();
+
+document.getElementById('themeBtn').onclick = () => { const r = document.documentElement, n = r.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', n); try{ localStorage.setItem('ws-theme', n); }catch{} };
+</script>
+</body>
+</html>

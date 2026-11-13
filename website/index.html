@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WinShield - Anti-ransomware detection, prevention and recovery</title>
+<meta name="description" content="WinShield watches your folders for the signs of ransomware, raises alerts, helps you contain the damage and restores verified copies of your files. Try the browser edition or build the Windows app.">
+<meta property="og:title" content="WinShield - Anti-ransomware detection, prevention and recovery">
+<meta property="og:description" content="Real-time ransomware detection with decoy files, integrity hashing and verified recovery points.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/site.css">
+<script>(function(){try{var t=localStorage.getItem('ws-theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})()</script>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/favicon.svg" width="26" height="26" alt="">WinShield</a>
+    <nav aria-label="Main">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#detection">Detection</a>
+      <a href="#editions">Editions</a>
+      <a href="#windows">Windows app</a>
+      <a href="#faq">FAQ</a>
+      <a href="/docs/">Docs</a>
+      <a class="btn primary small" href="/app/">Open browser edition</a>
+      <button class="theme" id="themeBtn" type="button" aria-label="Switch between light and dark mode" title="Light / dark mode"><span class="moon" aria-hidden="true">☾</span><span class="sun" aria-hidden="true">☀</span></button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">Anti-ransomware for Windows</span>
+      <h1>Catch ransomware while it is still happening.</h1>
+      <p class="lead">WinShield watches your folders for the telltale signs of encryption: mass renames, near-random data, ransom notes and touched decoy files. Then it helps you contain the damage and restore copies that are verified against their hashes.</p>
+      <div class="cta">
+        <a class="btn primary" href="/app/">Try it in your browser</a>
+        <a class="btn ghost" href="#windows">Get the Windows app</a>
+      </div>
+      <small>Nothing is uploaded. The browser edition keeps everything on your device.</small>
+    </div>
+
+    <div class="mock" role="img" aria-label="Illustration of the WinShield dashboard showing a critical alert after a decoy file was touched">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div class="alert">ALERT: Decoy file triggered (Critical, Open)</div>
+      <div class="card"><div class="row"><span class="dot" style="background:var(--danger)"></span><div><div class="big">Protection is on</div><div style="color:var(--muted)">Watching 3 folders, 2,481 files</div></div></div></div>
+      <div class="tiles">
+        <div class="tile"><b><span class="pill crit">Critical</span></b><span>Threat level</span></div>
+        <div class="tile"><b>22</b><span>Files renamed</span></div>
+        <div class="tile"><b>14</b><span>High-entropy files</span></div>
+      </div>
+      <div class="log" style="margin-top:10px">
+        [19:44:16] Practice: 22 renamed<br>
+        <span class="bad">[19:44:16] INCIDENT: Possible ransomware activity (Critical, score 95)</span><br>
+        <span class="bad">[19:44:19] DECOY TOUCHED: !0_Tax_Records_2025.docx was modified</span><br>
+        <span class="bad">[19:44:22] New evidence: R-RANSOM-NOTE</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <h2>Everything you need to spot, stop and recover</h2>
+    <p class="sub">Eight capabilities that work together. Some run in the browser, others need the deeper access of the Windows app.</p>
+    <div class="grid g4">
+      <div class="card"><div class="ico">👁️</div><h3>Real-time monitoring</h3><p>Watches the folders you choose and logs every create, modify, rename and delete. Counts distinct files in a sliding window, so one busy file cannot cause an alarm.</p><span class="tag">Browser + Windows</span></div>
+      <div class="card"><div class="ico">🧠</div><h3>Detection engine</h3><p>Seven rule-based detectors add up to a 0 to 100 score that maps to Medium, High or Critical. An optional classifier can raise a score but never lower one.</p><span class="tag">Browser + Windows</span></div>
+      <div class="card"><div class="ico">🪤</div><h3>Decoy files</h3><p>Bait files nobody should touch. If anything modifies, renames or deletes one, WinShield raises a Critical alert immediately.</p><span class="tag">Browser + Windows</span></div>
+      <div class="card"><div class="ico">🔐</div><h3>File integrity</h3><p>SHA-256 baselines of your files, then a comparison that lists what was modified, deleted, renamed or added.</p><span class="tag">Browser + Windows</span></div>
+      <div class="card"><div class="ico">🔬</div><h3>Behaviour analysis</h3><p>Flags programs started from temp folders, heavy disk writes, attempts to disable Defender, deletion of backups and shadow copies, and new startup entries.</p><span class="tag win">Windows app</span></div>
+      <div class="card"><div class="ico">🛡️</div><h3>Automated response</h3><p>Suspends or terminates malicious processes with guard rails, quarantines executables, isolates the network, turns on Controlled Folder Access, and asks first by default.</p><span class="tag win">Windows app</span></div>
+      <div class="card"><div class="ico">♻️</div><h3>Backup and recovery</h3><p>Recovery points that store identical data once, tamper checks, and restores where every file is verified against its recorded hash.</p><span class="tag">Browser + Windows</span></div>
+      <div class="card"><div class="ico">📋</div><h3>Dashboard and reports</h3><p>Live threat level, incident history with defensive actions taken, and downloadable HTML or CSV reports with recommendations.</p><span class="tag">Browser + Windows</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="alt">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="sub">Four stages from the first suspicious file change to verified recovery.</p>
+    <div class="steps">
+      <div class="step"><h3>Watch</h3><p>Protected folders are scanned continuously. Each change becomes an event with its extension and a sample of the file's entropy.</p></div>
+      <div class="step"><h3>Detect</h3><p>Rules look at the last few seconds of activity: mass changes, extension swaps, ransomware-style names, near-random content and decoy touches.</p></div>
+      <div class="step"><h3>Respond</h3><p>An incident opens with severity, evidence and recommendations. The Windows app can also suspend the process, quarantine it and isolate the network.</p></div>
+      <div class="step"><h3>Recover</h3><p>Restore from a recovery point taken before the incident. Every restored file is checked against its hash, and damaged versions are kept as evidence.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="detection">
+  <div class="wrap">
+    <h2>Transparent detection</h2>
+    <p class="sub">No black box. These are the rules and points the engine uses, with the default thresholds. All of them can be changed in Settings.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Rule</th><th>Fires when (defaults, in a 10 second window)</th><th>Points</th></tr></thead>
+      <tbody>
+        <tr><td><code>R-HONEYPOT</code></td><td>A decoy file is modified, renamed or deleted</td><td>60 (score at least 90)</td></tr>
+        <tr><td><code>R-MASS-MODIFY</code></td><td>40 or more files created or modified (80 or more scores higher)</td><td>25 or 35</td></tr>
+        <tr><td><code>R-EXT-CHANGE</code></td><td>15 or more files had their extension changed</td><td>30</td></tr>
+        <tr><td><code>R-SUSPICIOUS-EXT</code></td><td>Files appear with extensions such as <code>.locked</code> or <code>.encrypted</code> (3 or more scores higher)</td><td>15 or 35</td></tr>
+        <tr><td><code>R-ENTROPY</code></td><td>8 or more normally uncompressed files now hold near-random data (7.5 bits per byte or more)</td><td>30</td></tr>
+        <tr><td><code>R-RANSOM-NOTE</code></td><td>Files named like <code>HOW_TO_DECRYPT.txt</code> are created (2 or more scores higher)</td><td>25 or 35</td></tr>
+        <tr><td><code>R-MASS-DELETE</code></td><td>40 or more files deleted</td><td>20</td></tr>
+      </tbody>
+    </table></div>
+    <p class="sub" style="margin:14px 0 0;font-size:15px">Severity: 35 or more is Medium, 60 or more is High, 85 or more is Critical. Already-compressed formats such as photos, videos, PDFs and Office documents are not counted as high entropy.</p>
+  </div>
+</section>
+
+<section id="editions" class="alt">
+  <div class="wrap">
+    <h2>Two editions, one engine</h2>
+    <p class="sub">The browser edition runs the same detection rules on folders you grant it. A web page is sandboxed, so process control and system-level defences live in the Windows app.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Capability</th><th class="c">Browser edition</th><th class="c">Windows app</th></tr></thead>
+      <tbody>
+        <tr><td>Watch folders and score activity with the rules above</td><td class="c yes">Yes</td><td class="c yes">Yes</td></tr>
+        <tr><td>Decoy files with immediate alerts</td><td class="c yes">Yes</td><td class="c yes">Yes</td></tr>
+        <tr><td>SHA-256 integrity baselines and comparison</td><td class="c yes">Yes</td><td class="c yes">Yes</td></tr>
+        <tr><td>Recovery points with verified restore</td><td class="c yes">Yes</td><td class="c yes">Yes</td></tr>
+        <tr><td>Incident history, HTML and CSV reports, evidence export</td><td class="c yes">Yes</td><td class="c yes">Yes</td></tr>
+        <tr><td>Safe self-test that triggers real detections</td><td class="c yes">Yes</td><td class="c yes">Test project</td></tr>
+        <tr><td>Shows which program changed a file</td><td class="c no">No</td><td class="c yes">Yes</td></tr>
+        <tr><td>Suspend or terminate the malicious process</td><td class="c no">No</td><td class="c yes">Yes</td></tr>
+        <tr><td>Quarantine malicious executables</td><td class="c no">No</td><td class="c yes">Yes</td></tr>
+        <tr><td>Network isolation and Controlled Folder Access</td><td class="c no">No</td><td class="c yes">Yes</td></tr>
+        <tr><td>Watches for Defender tampering, backup deletion, persistence</td><td class="c no">No</td><td class="c yes">Yes</td></tr>
+        <tr><td>Keeps watching</td><td class="c">While the page is open</td><td class="c">While the app runs</td></tr>
+        <tr><td>Setup</td><td class="c">Nothing to install (Chrome or Edge for real folders)</td><td class="c">Build with the .NET 8 SDK</td></tr>
+      </tbody>
+    </table></div>
+    <div class="cta" style="margin-top:22px"><a class="btn primary" href="/app/">Open the browser edition</a><a class="btn line" href="/docs/">Read the docs</a></div>
+  </div>
+</section>
+
+<section id="windows">
+  <div class="wrap">
+    <h2>The Windows app</h2>
+    <p class="sub">A WPF desktop application on .NET 8 with a local SQLite database. It is built from source.</p>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Build and run</h3>
+        <p>Requires Windows 10 or 11 and the .NET 8 SDK. Run it as administrator to unlock process suspension, Controlled Folder Access and network isolation. The app offers a Restart as administrator button.</p>
+        <pre><code>cd WinShield
+dotnet run</code></pre>
+        <p>Run the logic tests, which cover detection, integrity, backup and restore, reports and process safety rules:</p>
+        <pre><code>cd tests\WinShield.Verify
+dotnet run</code></pre>
+      </div>
+      <div class="card">
+        <h3>Built to be safe to run</h3>
+        <p>WinShield never acts on core Windows processes, on itself, or on programs you marked as trusted. Suspending a process, emergency protection and network isolation ask first unless you turn on the matching automatic option.</p>
+        <p style="margin-top:10px">Quarantined files and damaged versions replaced during a restore are kept, not deleted. Everything is stored locally in <code>%LocalAppData%\WinShield</code>.</p>
+        <div class="callout warn">Test on a throwaway folder first. The app can suspend processes, quarantine files and cut off the network.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="alt">
+  <div class="wrap">
+    <h2>Questions</h2>
+    <p class="sub">Straight answers, including the limits.</p>
+    <details><summary>Does it replace antivirus or backups?</summary><p>No. WinShield is a defence-in-depth tool. Keep Microsoft Defender on and keep a tested backup on a separate drive or account. Detection is heuristic, so expect occasional false alarms during large builds or archive extraction. You can mark those incidents as false positives.</p></details>
+    <details><summary>Does anything leave my computer?</summary><p>No. The browser edition has no analytics and makes no network requests after the page loads. Settings, history and recovery points stay in your browser's own storage. The Windows app stores its data in a local SQLite database.</p></details>
+    <details><summary>Why can't the browser edition stop the program doing the damage?</summary><p>Browsers deliberately cannot see other programs or control the operating system. The browser edition tells you what changed and gives you evidence and recovery points. To suspend a process or isolate the network you need the Windows app.</p></details>
+    <details><summary>Which browsers can watch real folders?</summary><p>Desktop Chrome and Edge, using the File System Access API. Other browsers can still use a practice folder kept in memory, which is useful for trying the self-test.</p></details>
+    <details><summary>Will it keep watching if I close the tab?</summary><p>No. Monitoring runs only while the page is open, and browsers slow background tabs. Keep the tab visible while you rely on it, or use the Windows app for continuous protection.</p></details>
+    <details><summary>Is the self-test safe?</summary><p>Yes. It creates 60 harmless files in a folder named <code>WinShield-selftest</code>, overwrites only those with random data, renames them to <code>.locked</code>, and touches a decoy it created. Nothing else is modified, and one button removes it all.</p></details>
+    <details><summary>What if an alert fires for real?</summary><p>Disconnect from the network first, close or shut down the suspicious program, save the evidence file, then restore from a recovery point taken before the incident and verify the files. Do not pay or contact the attacker before checking your backups.</p></details>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="band">
+      <div><h2>See it detect an attack in under a minute</h2><p>Add a practice folder, run the safe self-test and watch the incident build up live.</p></div>
+      <a class="btn" href="/app/">Open the browser edition</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b style="color:#fff">WinShield</b><br>Intelligent Windows anti-ransomware detection, prevention and incident response.<br>A capstone project. It does not replace Microsoft Defender or a tested backup.</div>
+    <div><a href="/app/">Browser edition</a><br><a href="/docs/">Documentation</a><br><a href="#windows">Windows app</a></div>
+  </div>
+</footer>
+<script>document.getElementById('themeBtn').onclick=function(){var r=document.documentElement,n=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('ws-theme',n)}catch(e){}}</script>
+</body>
+</html>

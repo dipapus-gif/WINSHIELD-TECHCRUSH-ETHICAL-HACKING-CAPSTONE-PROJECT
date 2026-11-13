@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Console test runner for the platform-independent logic: detection engine, ML classifier, entropy,
+    file integrity, backups and restore, reports, process guard rails and recommendations.
+    It compiles the real source files directly, needs no NuGet packages, and runs on Windows, Linux
+    or macOS:   run "dotnet run" from the tests/WinShield.Verify folder
+    The exit code is 0 when every check passes and 1 otherwise.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseAppHost>false</UseAppHost>
+    <NoWarn>CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\Core\**\*.cs" />
+    <Compile Include="..\..\Models\CheckResult.cs;..\..\Models\ScanRecord.cs;..\..\Models\Protection.cs" />
+    <Compile Include="..\..\Services\DetectionEngine.cs;..\..\Services\ThreatClassifier.cs;..\..\Services\EntropyCalculator.cs;..\..\Services\ProcessSafety.cs;..\..\Services\RecommendationEngine.cs" />
+  </ItemGroup>
+
+</Project>

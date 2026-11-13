@@ -1,0 +1,9 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>WinShield - Anti-Ransomware</title><meta name="description" content="WinShield browser edition: real-time ransomware detection, decoy files, file integrity and recovery points for folders you choose."><link rel="icon" href="/favicon.svg" type="image/svg+xml"></head><body style="margin:0;background:#F4F6F9;font:14px system-ui,sans-serif"><p id="m" style="padding:24px">Loading WinShield...</p>
+<script>
+(async()=>{try{
+const parts=await Promise.all([1,2,3,4].map(n=>fetch('/app/p'+n+'.txt').then(r=>{if(!r.ok)throw new Error('part '+n+' missing');return r.text()})));
+const bin=Uint8Array.from(atob(parts.join('')),c=>c.charCodeAt(0));
+const html=await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+document.open();document.write(html);document.close();
+}catch(e){document.getElementById('m').textContent='Could not load WinShield: '+e.message+'. Please use a current version of Chrome, Edge, Firefox or Safari.';}})();
+</script><noscript>WinShield needs JavaScript.</noscript></body></html>

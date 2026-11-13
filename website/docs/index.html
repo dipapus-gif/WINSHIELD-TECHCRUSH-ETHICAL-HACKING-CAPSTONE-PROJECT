@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WinShield documentation</title>
+<meta name="description" content="How to use the WinShield browser edition and build the Windows app, how detection scoring works, and how to fix common problems.">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/site.css">
+<script>(function(){try{var t=localStorage.getItem('ws-theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})()</script>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/favicon.svg" width="26" height="26" alt="">WinShield</a>
+    <nav aria-label="Main">
+      <a href="/#features">Features</a>
+      <a href="/#editions">Editions</a>
+      <a href="/docs/">Docs</a>
+      <a class="btn primary small" href="/app/">Open browser edition</a>
+      <button class="theme" id="themeBtn" type="button" aria-label="Switch between light and dark mode" title="Light / dark mode"><span class="moon" aria-hidden="true">☾</span><span class="sun" aria-hidden="true">☀</span></button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap doc">
+  <aside class="toc" aria-label="On this page">
+    <a href="#quick">Quick start (browser)</a>
+    <a href="#selftest">Self-test</a>
+    <a href="#decoys">Decoys and integrity</a>
+    <a href="#recovery">Recovery points</a>
+    <a href="#incident">If an alert fires</a>
+    <a href="#scoring">How scoring works</a>
+    <a href="#windows">Windows app</a>
+    <a href="#trouble">Troubleshooting</a>
+    <a href="#privacy">Privacy and limits</a>
+  </aside>
+
+  <main id="main">
+    <h1>Documentation</h1>
+    <p class="sub" style="margin-bottom:0">Everything you need to use WinShield, in the order you will need it.</p>
+
+    <h2 id="quick">Quick start (browser edition)</h2>
+    <ol>
+      <li>Open the <a href="/app/">browser edition</a> in desktop Chrome or Edge.</li>
+      <li>Click <b>Choose a folder to protect</b>. The browser asks for permission to view and edit that one folder. Other browsers can use <b>Use a practice folder</b>.</li>
+      <li>On <b>Folders and integrity</b>, place decoy files and build a baseline while you know your files are clean.</li>
+      <li>On <b>Recovery</b>, create a recovery point.</li>
+      <li>Keep the tab open. WinShield re-reads the folder about every second and scores what changed.</li>
+    </ol>
+    <div class="callout">After a reload the browser asks you to grant folder access again. Use the <b>Reconnect</b> button on the Folders tab.</div>
+
+    <h2 id="selftest">Safe self-test</h2>
+    <p>On the Dashboard, <b>Run self-test</b> creates 60 harmless text files in a <code>WinShield-selftest</code> folder inside your protected folder, plus a decoy. It then does what ransomware does, only to those files:</p>
+    <ul>
+      <li>overwrites 14 files with random data (high entropy),</li>
+      <li>renames 22 files to <code>.locked</code> (extension change, ransomware extension),</li>
+      <li>modifies the decoy (honeypot),</li>
+      <li>creates <code>HOW_TO_DECRYPT_YOUR_FILES.txt</code> (ransom note).</li>
+    </ul>
+    <p>The engine sees real file changes and raises a real Critical incident. Use <b>Clean up self-test files</b> afterwards.</p>
+
+    <h2 id="decoys">Decoys and integrity</h2>
+    <h3>Decoy files</h3>
+    <p>WinShield places three bait files in the protected folder and two in each of up to three sub-folders. Their names sort first and last so alphabetical encryptors hit one early. Any change to a decoy opens a Critical incident straight away.</p>
+    <h3>Integrity baseline</h3>
+    <p>A baseline stores the SHA-256 hash of every file up to 50 MB. <b>Compare with baseline</b> then lists each file that was modified, deleted, renamed (same content, new name) or added.</p>
+
+    <h2 id="recovery">Recovery points</h2>
+    <p>A recovery point copies your files into the browser's private storage. Identical content is stored once, so repeated points are cheap. Files over 25 MB are skipped and reported.</p>
+    <ul>
+      <li><b>Verify selected</b> re-hashes every stored file to detect damage or tampering.</li>
+      <li><b>Restore to a new sub-folder</b> is the safest option because it changes nothing that exists.</li>
+      <li><b>Restore over originals</b> replaces files that differ. Damaged versions are kept as evidence and every restored file is checked against its hash.</li>
+    </ul>
+    <p>Points created while an incident is open are marked, because they may contain encrypted files. Prefer an earlier point.</p>
+
+    <h2 id="incident">If an alert fires</h2>
+    <ol>
+      <li>Disconnect from Wi-Fi and unplug the network cable.</li>
+      <li>Close the suspicious program in Task Manager, or shut the PC down.</li>
+      <li>On the Incidents tab, save the evidence (JSON) and a report.</li>
+      <li>Use <b>Activate emergency protection</b> to copy every file that has not been touched yet into a recovery point.</li>
+      <li>Restore from a point taken before the incident and verify the result.</li>
+    </ol>
+    <div class="callout warn">The browser edition cannot see or stop the program responsible. That needs the Windows app.</div>
+
+    <h2 id="scoring">How scoring works</h2>
+    <p>The engine looks at the last 10 seconds of events and counts distinct files, so one busy file cannot trigger an alert. Rules add points; the total is capped at 100.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Setting</th><th>Default</th><th>Allowed range</th></tr></thead>
+      <tbody>
+        <tr><td>Window (seconds)</td><td>10</td><td>3 to 120</td></tr>
+        <tr><td>Mass modify (files)</td><td>40</td><td>5 to 5000</td></tr>
+        <tr><td>Mass rename, extension change (files)</td><td>15</td><td>3 to 5000</td></tr>
+        <tr><td>Mass delete (files)</td><td>40</td><td>5 to 5000</td></tr>
+        <tr><td>Ransomware-style extensions (files)</td><td>3</td><td>1 to 100</td></tr>
+        <tr><td>High entropy (bits per byte)</td><td>7.5</td><td>6.0 to 8.0</td></tr>
+        <tr><td>High-entropy file count</td><td>8</td><td>2 to 1000</td></tr>
+      </tbody>
+    </table></div>
+    <p>Severity bands: 35 or more is Medium, 60 or more is High, 85 or more is Critical. A touched decoy forces the score to at least 90. After the first alert, WinShield adds any rule that fires later (for example a decoy touched or a ransom note dropped) to the same incident.</p>
+    <p>Entropy is measured on the first 64 KB of a changed file. Files under 1 KB are skipped, and formats that are already compressed, such as photos, videos, PDFs and Office documents, are not counted.</p>
+    <p>A browser cannot be told about renames, so it infers them: a file that disappears and a file that appears in the same folder with the same name plus an extension, or the same size and timestamp, are treated as one rename.</p>
+
+    <h2 id="windows">Windows app</h2>
+    <p>Requirements: Windows 10 or 11 and the .NET 8 SDK.</p>
+<pre><code>cd WinShield
+dotnet run</code></pre>
+    <p>Run it as administrator for the full feature set. Without administrator rights, monitoring, decoys, integrity checks, backups and alerts all work. Suspending some processes, Controlled Folder Access and network isolation need elevation.</p>
+    <h3>Response modes</h3>
+    <p>By default WinShield asks before any disruptive action. Settings let you choose automatic containment or automatic network isolation. WinShield never acts on core Windows processes, on itself, or on programs you marked as trusted.</p>
+    <h3>Logic tests</h3>
+<pre><code>cd tests\WinShield.Verify
+dotnet run</code></pre>
+    <p>The test project exits with code 0 when all checks pass. It does not cover the WPF screens.</p>
+
+    <h2 id="trouble">Troubleshooting</h2>
+    <h3>Build error NETSDK1135</h3>
+    <p><code>SupportedOSPlatformVersion 10.0.17763.0 cannot be higher than TargetPlatformVersion 7.0.</code> This was a bug in an earlier project file. Use the latest source, or delete the <code>SupportedOSPlatformVersion</code> line from <code>WinShield.csproj</code>.</p>
+    <h3>You only have a preview SDK (for example 11.0.100)</h3>
+    <p>The project targets .NET 8. Install the .NET 8 SDK from Microsoft if the build or run step complains about a missing runtime or targeting pack.</p>
+    <h3>A check says it could not run</h3>
+    <p>Some checks read protected registry keys. Start the app as administrator.</p>
+    <h3>The browser edition says folder access is unavailable</h3>
+    <p>Use desktop Chrome or Edge over HTTPS. Other browsers can use the practice folder.</p>
+    <h3>Monitoring seems slow in a background tab</h3>
+    <p>Browsers throttle hidden tabs. Keep WinShield visible, for example in its own window, while you rely on it.</p>
+    <h3>False alarms</h3>
+    <p>Large builds, archive extraction and bulk photo exports can look like mass modification. Mark the incident as a false positive, and raise the thresholds in Settings if it keeps happening.</p>
+
+    <h2 id="privacy">Privacy and limits</h2>
+    <ul>
+      <li>The browser edition makes no network requests after the page loads. Settings, incident history, baselines and recovery points stay in your browser's own storage for this site.</li>
+      <li>The page can only see the folders you grant. Clearing site data removes recovery points.</li>
+      <li>Detection is heuristic. WinShield is a defence-in-depth tool and does not replace Microsoft Defender or a tested backup on a separate drive or account.</li>
+      <li>Recovery points live in the same browser profile as the page. If ransomware can reach that profile folder, keep an external backup as well.</li>
+    </ul>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div><b style="color:#fff">WinShield</b><br>Intelligent Windows anti-ransomware detection, prevention and incident response.</div>
+    <div><a href="/">Home</a><br><a href="/app/">Browser edition</a></div>
+  </div>
+</footer>
+<script>document.getElementById('themeBtn').onclick=function(){var r=document.documentElement,n=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('ws-theme',n)}catch(e){}}</script>
+</body>
+</html>
