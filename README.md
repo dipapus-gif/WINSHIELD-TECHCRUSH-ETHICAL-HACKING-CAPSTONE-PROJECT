@@ -19,4 +19,8 @@ Every push to `main` builds `WinShield.exe` (self-contained, no .NET install nee
 create an account, and keep the recovery key somewhere safe. Right-click -> Run as administrator for
 process suspension, quarantine and network isolation.
 
+Two downloads are attached to each release:
+- `WinShield-small-needs-dotnet8.zip` (a few MB): needs the free [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0).
+- `WinShield-win-x64.zip` (about 65 MB): runs on any Windows 10/11 PC with nothing installed.
+
 Logo and brand assets are in `brand/`.

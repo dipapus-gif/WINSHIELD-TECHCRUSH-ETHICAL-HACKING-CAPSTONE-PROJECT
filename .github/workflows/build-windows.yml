@@ -30,20 +30,32 @@ jobs:
           -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
           -p:EnableCompressionInSingleFile=true -o ../dist
 
+      - name: Publish the SMALL build (needs the free .NET 8 Desktop Runtime)
+        working-directory: windows-app
+        run: >
+          dotnet publish WinShield.csproj -c Release -r win-x64 --self-contained false
+          -p:PublishSingleFile=true -o ../dist-small
+
       - name: Package
         shell: pwsh
         run: |
           Copy-Item README.md dist/README.md
+          Copy-Item README.md dist-small/README.md
           Compress-Archive -Path dist/* -DestinationPath WinShield-win-x64.zip
+          Compress-Archive -Path dist-small/* -DestinationPath WinShield-small-needs-dotnet8.zip
 
       - uses: actions/upload-artifact@v4
         with:
           name: WinShield-win-x64
-          path: WinShield-win-x64.zip
+          path: |
+            WinShield-win-x64.zip
+            WinShield-small-needs-dotnet8.zip
 
       - name: Publish a release (downloadable link)
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('build-{0}', github.run_number) }}
           name: WinShield ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('build {0}', github.run_number) }}
-          files: WinShield-win-x64.zip
+          files: |
+            WinShield-win-x64.zip
+            WinShield-small-needs-dotnet8.zip
