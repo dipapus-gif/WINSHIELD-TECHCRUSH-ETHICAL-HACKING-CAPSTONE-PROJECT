@@ -11,3 +11,12 @@ TechCrush Ethical Hacking capstone project.
 Live site: https://winshield-web-final.vercel.app
 
 WinShield does not replace Microsoft Defender or a tested backup.
+
+## Download the Windows app
+
+Every push to `main` builds `WinShield.exe` (self-contained, no .NET install needed) and attaches
+`WinShield-win-x64.zip` to a GitHub Release (Releases page on this repo). Unzip, run `WinShield.exe`,
+create an account, and keep the recovery key somewhere safe. Right-click -> Run as administrator for
+process suspension, quarantine and network isolation.
+
+Logo and brand assets are in `brand/`.

@@ -1,7 +1,7 @@
 <Window x:Class="WinShield.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="WinShield - Sign in" Width="460" Height="640" ResizeMode="NoResize"
+        Title="WinShield - Sign in" Icon="/winshield.ico" Width="460" Height="690" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen" Background="#0A0A0C"
         FontFamily="Segoe UI" FontSize="14">
 
@@ -80,14 +80,8 @@
 
         <StackPanel Margin="40,28,40,20">
             <!-- Logo: gold shield with a check mark -->
-            <Viewbox Width="64" Height="64" HorizontalAlignment="Center">
-                <Canvas Width="24" Height="24">
-                    <Path Fill="#FFC933" Data="M 12,2 L 4,5 L 4,11 C 4,16 7.4,20.3 12,22 C 16.6,20.3 20,16 20,11 L 20,5 Z" />
-                    <Path Stroke="#14110A" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
-                          Data="M 8.5,12 L 11,14.5 L 16,9.5" />
-                </Canvas>
-            </Viewbox>
-            <TextBlock Text="WinShield" Foreground="#F6F1E0" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,8,0,0" />
+            <Image Source="/Assets/logo.png" Width="132" Height="132" HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" />
+            <TextBlock Text="WinShield" Foreground="#F6F1E0" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0" />
             <TextBlock x:Name="Subtitle" Text="Sign in to your protection console" Foreground="{StaticResource Soft}" HorizontalAlignment="Center" Margin="0,0,0,18" />
 
             <!-- ============ SIGN IN ============ -->
