@@ -1,0 +1,29 @@
+name: PowerShell scripts parse check
+
+on:
+  push:
+    branches: [main]
+    paths: ['tools/**', '.github/workflows/powershell-check.yml']
+  workflow_dispatch:
+
+jobs:
+  parse:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse every .ps1 (syntax errors fail the build)
+        shell: pwsh
+        run: |
+          $bad = 0
+          Get-ChildItem -Path tools -Recurse -Filter *.ps1 | ForEach-Object {
+            $errors = $null; $tokens = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors)
+            if ($errors.Count) { $bad++; "FAIL $($_.FullName)"; $errors | ForEach-Object { "  line $($_.Extent.StartLineNumber): $($_.Message)" } }
+            else { "ok   $($_.FullName)" }
+          }
+          if ($bad) { exit 1 }
+      - name: Lab self-check without elevation side effects
+        shell: pwsh
+        run: |
+          # Dot-source is not possible (script runs on load); just confirm the help text builds.
+          Get-Help ./tools/WinShield-Lab/WinShield-Lab.ps1 | Out-String | Select-Object -First 1
