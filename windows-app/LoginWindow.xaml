@@ -5,6 +5,18 @@
         WindowStartupLocation="CenterScreen" Background="#0A0A0C"
         FontFamily="Segoe UI" FontSize="14">
 
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="LogoScale" Storyboard.TargetProperty="ScaleX" From="0.96" To="1.07" Duration="0:0:2.2" AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="LogoScale" Storyboard.TargetProperty="ScaleY" From="0.96" To="1.07" Duration="0:0:2.2" AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="LogoGlow" Storyboard.TargetProperty="BlurRadius" From="10" To="42" Duration="0:0:2.2" AutoReverse="True" RepeatBehavior="Forever" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+
     <Window.Resources>
         <SolidColorBrush x:Key="Gold" Color="#FFC933" />
         <SolidColorBrush x:Key="Ink" Color="#14110A" />
@@ -80,7 +92,11 @@
 
         <StackPanel Margin="40,28,40,20">
             <!-- Logo: gold shield with a check mark -->
-            <Image Source="/Assets/logo.png" Width="132" Height="132" HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" />
+            <Image x:Name="LogoImg" Source="/Assets/logo.png" Width="132" Height="132" HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"
+                   RenderTransformOrigin="0.5,0.5">
+                <Image.RenderTransform><ScaleTransform x:Name="LogoScale" /></Image.RenderTransform>
+                <Image.Effect><DropShadowEffect x:Name="LogoGlow" Color="#FFC933" ShadowDepth="0" BlurRadius="14" Opacity="0.8" /></Image.Effect>
+            </Image>
             <TextBlock Text="WinShield" Foreground="#F6F1E0" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0" />
             <TextBlock x:Name="Subtitle" Text="Sign in to your protection console" Foreground="{StaticResource Soft}" HorizontalAlignment="Center" Margin="0,0,0,18" />
 

@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using WinShield.Ui;
 using WinShield.ViewModels;
 
@@ -28,6 +29,21 @@ public partial class MainWindow : Window
         };
     }
 
+    /// <summary>Each tab slides up and fades in when selected.</summary>
+    private void OnTabChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!ReferenceEquals(e.Source, Tabs) || !App.Animate) return;
+        if (Tabs.SelectedItem is TabItem { Content: FrameworkElement fe })
+        {
+            var move = new TranslateTransform(0, 26);
+            fe.RenderTransform = move;
+            var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+            var dur = TimeSpan.FromMilliseconds(420);
+            move.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(26, 0, dur) { EasingFunction = ease });
+            fe.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, dur));
+        }
+    }
+
     private void OnSignOut(object sender, RoutedEventArgs e) => SignOutRequested?.Invoke(this, EventArgs.Empty);
 
     // ---------------------------------------------------------------- light / dark
@@ -52,7 +68,7 @@ public partial class MainWindow : Window
     }
 
     private void OnStateChanged(object? sender, EventArgs e) =>
-        MaxBtn.Content = WindowState == WindowState.Maximized ? "\u2750  Restore" : "\u25A1  Maximize";
+        MaxBtn.Content = WindowState == WindowState.Maximized ? "\u2750" : "\u25A1";
 
     private void OnFullScreen(object sender, RoutedEventArgs e) { if (_full) ExitFullScreen(); else EnterFullScreen(); }
 
@@ -64,7 +80,7 @@ public partial class MainWindow : Window
         WindowState = WindowState.Normal;      // re-apply Maximized so the taskbar is covered
         WindowState = WindowState.Maximized;
         _full = true;
-        FullBtn.Content = "\u2715  Exit full screen";
+        FullBtn.Content = "\u2715";
     }
 
     private void ExitFullScreen()
@@ -73,7 +89,7 @@ public partial class MainWindow : Window
         ResizeMode = _prevResize;
         WindowState = _prevState == WindowState.Minimized ? WindowState.Normal : _prevState;
         _full = false;
-        FullBtn.Content = "\u26F6  Full screen";
+        FullBtn.Content = "\u26F6";
     }
 
     // ---------------------------------------------------------------- zoom

@@ -25,12 +25,15 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                        <Border x:Name="Bd" RenderTransformOrigin="0.5,0.5" Background="{TemplateBinding Background}"
                                 CornerRadius="9" Padding="{TemplateBinding Padding}">
+                            <Border.RenderTransform><ScaleTransform /></Border.RenderTransform>
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" To="1.06" Duration="0:0:0.14" /><DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" To="1.06" Duration="0:0:0.14" /></Storyboard></BeginStoryboard></Trigger.EnterActions>
+                                <Trigger.ExitActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" To="1" Duration="0:0:0.14" /><DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" To="1" Duration="0:0:0.14" /></Storyboard></BeginStoryboard></Trigger.ExitActions>
                                 <Setter TargetName="Bd" Property="Opacity" Value="0.88" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
@@ -58,12 +61,15 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                        <Border x:Name="Bd" RenderTransformOrigin="0.5,0.5" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="9" Padding="{TemplateBinding Padding}">
+                            <Border.RenderTransform><ScaleTransform /></Border.RenderTransform>
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" To="1.06" Duration="0:0:0.14" /><DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" To="1.06" Duration="0:0:0.14" /></Storyboard></BeginStoryboard></Trigger.EnterActions>
+                                <Trigger.ExitActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" To="1" Duration="0:0:0.14" /><DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" To="1" Duration="0:0:0.14" /></Storyboard></BeginStoryboard></Trigger.ExitActions>
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource HoverBrush}" />
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
@@ -96,22 +102,35 @@
         </Style>
 
         <!-- Coloured tiles: same card with a thick coloured top edge. -->
-        <Style x:Key="TileCard1" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileBase" TargetType="Border" BasedOn="{StaticResource Card}">
+            <Setter Property="RenderTransform"><Setter.Value><TranslateTransform /></Setter.Value></Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions><BeginStoryboard><Storyboard>
+                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" To="-6" Duration="0:0:0.18" />
+                    </Storyboard></BeginStoryboard></Trigger.EnterActions>
+                    <Trigger.ExitActions><BeginStoryboard><Storyboard>
+                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.22" />
+                    </Storyboard></BeginStoryboard></Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="TileCard1" TargetType="Border" BasedOn="{StaticResource TileBase}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile1}" /><Setter Property="BorderThickness" Value="1,3,1,1" />
         </Style>
-        <Style x:Key="TileCard2" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileCard2" TargetType="Border" BasedOn="{StaticResource TileBase}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile2}" /><Setter Property="BorderThickness" Value="1,3,1,1" />
         </Style>
-        <Style x:Key="TileCard3" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileCard3" TargetType="Border" BasedOn="{StaticResource TileBase}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile3}" /><Setter Property="BorderThickness" Value="1,3,1,1" />
         </Style>
-        <Style x:Key="TileCard4" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileCard4" TargetType="Border" BasedOn="{StaticResource TileBase}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile4}" /><Setter Property="BorderThickness" Value="1,3,1,1" />
         </Style>
-        <Style x:Key="TileCard5" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileCard5" TargetType="Border" BasedOn="{StaticResource TileBase}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile5}" /><Setter Property="BorderThickness" Value="1,3,1,1" />
         </Style>
-        <Style x:Key="TileCard6" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Style x:Key="TileCard6" TargetType="Border" BasedOn="{StaticResource TileBase}">
             <Setter Property="BorderBrush" Value="{DynamicResource Tile6}" /><Setter Property="BorderThickness" Value="1,3,1,1" />
         </Style>
 

@@ -8,6 +8,14 @@
         WindowStartupLocation="CenterScreen" ResizeMode="CanResize"
         PreviewKeyDown="OnKey" StateChanged="OnStateChanged">
 
+    <Window.Triggers><EventTrigger RoutedEvent="FrameworkElement.Loaded"><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="Orb1" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" From="0" To="520" Duration="0:0:13" AutoReverse="True" RepeatBehavior="Forever"><DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Orb1" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="0" To="260" Duration="0:0:16" AutoReverse="True" RepeatBehavior="Forever"><DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Orb2" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" From="0" To="-480" Duration="0:0:16" AutoReverse="True" RepeatBehavior="Forever"><DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Orb2" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="0" To="200" Duration="0:0:19" AutoReverse="True" RepeatBehavior="Forever"><DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Orb3" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" From="0" To="360" Duration="0:0:19" AutoReverse="True" RepeatBehavior="Forever"><DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Orb3" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="0" To="-240" Duration="0:0:22" AutoReverse="True" RepeatBehavior="Forever"><DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="BannerShieldScale" Storyboard.TargetProperty="ScaleX" From="0.92" To="1.1" Duration="0:0:2.4" AutoReverse="True" RepeatBehavior="Forever"><DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="BannerShieldScale" Storyboard.TargetProperty="ScaleY" From="0.92" To="1.1" Duration="0:0:2.4" AutoReverse="True" RepeatBehavior="Forever"><DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut" /></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="PulseScale" Storyboard.TargetProperty="ScaleX" From="0.5" To="2.4" Duration="0:0:1.6" RepeatBehavior="Forever" /><DoubleAnimation Storyboard.TargetName="PulseScale" Storyboard.TargetProperty="ScaleY" From="0.5" To="2.4" Duration="0:0:1.6" RepeatBehavior="Forever" /><DoubleAnimation Storyboard.TargetName="PulseRing" Storyboard.TargetProperty="Opacity" From="0.7" To="0" Duration="0:0:1.6" RepeatBehavior="Forever" /></Storyboard></BeginStoryboard></EventTrigger></Window.Triggers>
+
+    <Grid>
+        <Grid IsHitTestVisible="False" ClipToBounds="True">
+            <Ellipse x:Name="Orb1" Width="460" Height="460" Fill="#FFC933" Opacity="0.30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-120,-160,0,0"><Ellipse.RenderTransform><TranslateTransform /></Ellipse.RenderTransform><Ellipse.Effect><BlurEffect Radius="90" /></Ellipse.Effect></Ellipse>
+            <Ellipse x:Name="Orb2" Width="520" Height="520" Fill="#7C4DFF" Opacity="0.26" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="500,120,0,0"><Ellipse.RenderTransform><TranslateTransform /></Ellipse.RenderTransform><Ellipse.Effect><BlurEffect Radius="90" /></Ellipse.Effect></Ellipse>
+            <Ellipse x:Name="Orb3" Width="420" Height="420" Fill="#0FA89A" Opacity="0.22" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,420,0,0"><Ellipse.RenderTransform><TranslateTransform /></Ellipse.RenderTransform><Ellipse.Effect><BlurEffect Radius="90" /></Ellipse.Effect></Ellipse>
+        </Grid>
     <Grid x:Name="Root" Margin="20,16,20,18">
         <Grid.LayoutTransform>
             <ScaleTransform x:Name="Zoom" ScaleX="1" ScaleY="1" />
@@ -31,9 +39,9 @@
                     <TextBlock Text="WinShield" Foreground="#FFC933" FontWeight="Bold" FontSize="15" Margin="8,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
             </Border>
-            <Button x:Name="MinBtn" DockPanel.Dock="Right" Content="&#8212;  Minimize" Click="OnMinimize" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Minimize to the taskbar" />
-            <Button x:Name="MaxBtn" DockPanel.Dock="Right" Content="&#9633;  Maximize" Click="OnMaximize" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Enlarge the window to fill the screen" />
-            <Button x:Name="FullBtn" DockPanel.Dock="Right" Content="&#9974;  Full screen" Click="OnFullScreen" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Full screen (F11)" />
+            <Button x:Name="MinBtn" DockPanel.Dock="Right" Content="&#8212;" Click="OnMinimize" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Minimize to the taskbar" />
+            <Button x:Name="MaxBtn" DockPanel.Dock="Right" Content="&#9633;" Click="OnMaximize" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Enlarge the window to fill the screen" />
+            <Button x:Name="FullBtn" DockPanel.Dock="Right" Content="&#9974;" Click="OnFullScreen" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Full screen (F11)" />
             <Button DockPanel.Dock="Right" Content="A+" Click="OnZoomIn" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Make everything larger (Ctrl and +)" />
             <Button DockPanel.Dock="Right" Content="A&#8722;" Click="OnZoomOut" Style="{StaticResource ActionButton}" Margin="6,0,0,0" ToolTip="Make everything smaller (Ctrl and -)" />
             <Button x:Name="ThemeBtn" DockPanel.Dock="Right" Click="OnToggleTheme" Style="{StaticResource ActionButton}" Margin="10,0,0,0" ToolTip="Switch between light and dark mode" />
@@ -44,7 +52,7 @@
             <Border />
         </DockPanel>
 
-        <TabControl Grid.Row="1" BorderThickness="0" Background="Transparent">
+        <TabControl x:Name="Tabs" Grid.Row="1" BorderThickness="0" Background="Transparent" SelectionChanged="OnTabChanged">
 
             <!-- ============================== DASHBOARD ============================== -->
             <TabItem Header="Dashboard" Padding="14,6">
@@ -78,9 +86,31 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
+                            <Border Grid.ColumnSpan="2" Margin="-22" CornerRadius="16" IsHitTestVisible="False">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#40FFFFFF" Offset="0" />
+                                        <GradientStop Color="#00FFFFFF" Offset="0.55" />
+                                        <GradientStop Color="#26000000" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                            <Image Grid.ColumnSpan="2" Source="/Assets/logo.png" Width="170" Height="170" Opacity="0.20" HorizontalAlignment="Right"
+                                   Margin="0,-30,250,-30" IsHitTestVisible="False" RenderTransformOrigin="0.5,0.5"
+                                   RenderOptions.BitmapScalingMode="HighQuality">
+                                <Image.RenderTransform><ScaleTransform x:Name="BannerShieldScale" /></Image.RenderTransform>
+                            </Image>
 
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="{Binding StatusTitle}" FontSize="24" FontWeight="Bold" Foreground="White" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Grid Width="20" Height="20" Margin="0,2,12,0" VerticalAlignment="Center">
+                                        <Ellipse x:Name="PulseRing" Fill="White" Opacity="0.5" RenderTransformOrigin="0.5,0.5">
+                                            <Ellipse.RenderTransform><ScaleTransform x:Name="PulseScale" ScaleX="1" ScaleY="1" /></Ellipse.RenderTransform>
+                                        </Ellipse>
+                                        <Ellipse Width="10" Height="10" Fill="White" />
+                                    </Grid>
+                                    <TextBlock Text="{Binding StatusTitle}" FontSize="28" FontWeight="Bold" Foreground="White" />
+                                </StackPanel>
                                 <TextBlock Text="{Binding StatusDetail}" Foreground="White" TextWrapping="Wrap" Margin="0,4,0,0" />
                                 <TextBlock Text="{Binding NetworkText}" Foreground="White" FontWeight="SemiBold" Margin="0,4,0,0" />
                                 <TextBlock Text="{Binding AdminText}" Foreground="White" FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0" />
@@ -664,5 +694,6 @@
                 </ScrollViewer>
             </TabItem>
         </TabControl>
+    </Grid>
     </Grid>
 </Window>

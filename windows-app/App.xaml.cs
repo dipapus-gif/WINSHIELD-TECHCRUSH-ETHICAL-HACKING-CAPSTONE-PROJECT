@@ -14,6 +14,9 @@ namespace WinShield;
 
 public partial class App : Application
 {
+    /// <summary>Entrance animations; the UI self-test turns them off so screenshots are not mid-fade.</summary>
+    public static bool Animate { get; set; } = true;
+
     private ProtectionService? _protection;
     private ShellViewModel? _shell;
     private AccountStore? _accounts;
@@ -116,6 +119,7 @@ public partial class App : Application
 
     private async Task RunUiSelfTest(string outDir)
     {
+        Animate = false;
         var log = new StringBuilder();
         var failed = false;
         try
