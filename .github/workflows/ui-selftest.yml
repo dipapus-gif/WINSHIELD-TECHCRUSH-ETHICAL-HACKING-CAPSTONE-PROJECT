@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   ui:
     runs-on: windows-latest
@@ -26,3 +29,15 @@ jobs:
         with:
           name: ui-shots
           path: ui-shots
+      - name: Publish screenshots to the ui-previews branch (so they can be reviewed)
+        if: always()
+        shell: pwsh
+        run: |
+          git config user.name "winshield-ci"; git config user.email "ci@users.noreply.github.com"
+          Copy-Item -Recurse ui-shots $env:RUNNER_TEMP\shots
+          git checkout --orphan ui-previews
+          git rm -rf . | Out-Null
+          Copy-Item -Recurse $env:RUNNER_TEMP\shots\* .
+          git add -A
+          git commit -m "UI screenshots for ${{ github.sha }}"
+          git push -f origin ui-previews
