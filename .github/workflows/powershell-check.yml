@@ -22,8 +22,16 @@ jobs:
             else { "ok   $($_.FullName)" }
           }
           if ($bad) { exit 1 }
-      - name: Lab self-check without elevation side effects
+      - name: Extract the PowerShell from the one-file Lab and parse it
         shell: pwsh
         run: |
-          # Dot-source is not possible (script runs on load); just confirm the help text builds.
-          Get-Help ./tools/WinShield-Lab/WinShield-Lab.ps1 | Out-String | Select-Object -First 1
+          $t = [IO.File]::ReadAllText("tools/WinShield-Lab.bat")
+          $i = $t.IndexOf('##PS1-START##')
+          if ($i -lt 0) { throw 'marker missing' }
+          $ps = $t.Substring($t.IndexOf([char]10, $i) + 1)
+          $errors = $null; $tokens = $null
+          [void][System.Management.Automation.Language.Parser]::ParseInput($ps, [ref]$tokens, [ref]$errors)
+          if ($errors.Count) { $errors | ForEach-Object { "line $($_.Extent.StartLineNumber): $($_.Message)" }; exit 1 }
+          "Lab script parses OK ($($ps.Length) chars)"
+          Set-Content -Path $env:TEMP\lab.ps1 -Value $ps
+          cmd /c "echo @echo off& echo rem x" | Out-Null

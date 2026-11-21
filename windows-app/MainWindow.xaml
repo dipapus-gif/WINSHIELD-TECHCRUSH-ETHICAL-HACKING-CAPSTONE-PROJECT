@@ -8,7 +8,7 @@
         WindowStartupLocation="CenterScreen" ResizeMode="CanResize"
         PreviewKeyDown="OnKey" StateChanged="OnStateChanged">
 
-    <Grid x:Name="Root" Margin="16">
+    <Grid x:Name="Root" Margin="20,16,20,18">
         <Grid.LayoutTransform>
             <ScaleTransform x:Name="Zoom" ScaleX="1" ScaleY="1" />
         </Grid.LayoutTransform>
@@ -19,7 +19,7 @@
 
         <!-- Brand and account bar -->
         <DockPanel Grid.Row="0" Margin="0,0,0,8">
-            <Border DockPanel.Dock="Left" CornerRadius="8" Padding="10,5">
+            <Border DockPanel.Dock="Left" CornerRadius="12" Padding="12,6">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                         <GradientStop Color="#0A0A0C" Offset="0" />
@@ -58,7 +58,8 @@
                     </Grid.RowDefinitions>
 
                     <!-- Protection status banner: grey = off, green = protected, red = emergency -->
-                    <Border Grid.Row="0" Padding="20" CornerRadius="10">
+                    <Border Grid.Row="0" Padding="22" CornerRadius="16">
+                        <Border.Effect><DropShadowEffect BlurRadius="22" ShadowDepth="4" Direction="270" Opacity="0.22" Color="#000000" /></Border.Effect>
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Background" Value="{DynamicResource OffBrush}" />
