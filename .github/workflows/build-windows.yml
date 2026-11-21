@@ -44,12 +44,34 @@ jobs:
           Compress-Archive -Path dist/* -DestinationPath WinShield-win-x64.zip
           Compress-Archive -Path dist-small/* -DestinationPath WinShield-small-needs-dotnet8.zip
 
+      - name: Build the sandbox ISO (WinShield + test script + installer)
+        shell: pwsh
+        run: |
+          pip install pycdlib --break-system-packages 2>$null; if ($LASTEXITCODE) { pip install pycdlib }
+          Copy-Item dist/WinShield.exe tools/iso/WinShield.exe
+          Copy-Item tools/WinShield-Test.ps1 tools/iso/WinShield-Test.ps1
+          @'
+          import pycdlib, os
+          d = "tools/iso"
+          files = [("WinShield.exe","WINSHIELD.EXE"),("WinShield-Test.ps1","WINSHIELD_TEST.PS1"),
+                   ("Install-WinShield.cmd","INSTALL_WINSHIELD.CMD"),("WinShield-Sandbox.wsb","WINSHIELD_SANDBOX.WSB"),
+                   ("README.txt","README.TXT")]
+          iso = pycdlib.PyCdlib()
+          iso.new(interchange_level=3, joliet=3, vol_ident="WINSHIELD")
+          for real, short in files:
+              iso.add_file(os.path.join(d, real), "/" + short + ";1", joliet_path="/" + real)
+          iso.write("WinShield-Sandbox.iso"); iso.close()
+          print("ISO bytes:", os.path.getsize("WinShield-Sandbox.iso"))
+          '@ | Set-Content -Path make_iso.py
+          python make_iso.py
+
       - uses: actions/upload-artifact@v4
         with:
           name: WinShield-win-x64
           path: |
             WinShield-win-x64.zip
             WinShield-small-needs-dotnet8.zip
+            WinShield-Sandbox.iso
 
       - name: Publish a release (downloadable link)
         uses: softprops/action-gh-release@v2
@@ -59,3 +81,4 @@ jobs:
           files: |
             WinShield-win-x64.zip
             WinShield-small-needs-dotnet8.zip
+            WinShield-Sandbox.iso

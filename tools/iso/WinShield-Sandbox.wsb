@@ -1,0 +1,17 @@
+<Configuration>
+  <!-- Windows Sandbox (Windows 10/11 Pro/Enterprise). Double-click this file on the host.
+       Put WinShield.exe and WinShield-Test.ps1 in C:\WinShieldSandbox on the host first
+       (copy them out of the ISO: right-click the ISO > Mount). Nothing the sandbox does touches your real files. -->
+  <VGpu>Enable</VGpu>
+  <Networking>Disable</Networking>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>C:\WinShieldSandbox</HostFolder>
+      <SandboxFolder>C:\WinShield</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <LogonCommand>
+    <Command>explorer.exe C:\WinShield</Command>
+  </LogonCommand>
+</Configuration>
